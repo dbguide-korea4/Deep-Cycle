@@ -1,65 +1,79 @@
-class Search:
+class SearchImgSE:
     def __init__(self, keywords):
         self.query = '+'.join(keywords.split(' '))
-    
+
     def naver_imgs_se(self, n_round=10):
-        import requests, os
+        import requests
+        import os
         from bs4 import BeautifulSoup
         from selenium import webdriver
-        
+        from datetime import datetime
+
         driver = webdriver.Chrome()
-        
+
         url = f'https://search.naver.com/search.naver?where=image&query={self.query}'
         driver.get(url)
-        
+
         n_except = 0
         for n in range(n_round):
             try:
-                driver.find_elements_by_css_selector("div.photo_grid div.img_area")[n].click()
+                driver.find_elements_by_css_selector(
+                    "div.photo_grid div.img_area")[n].click()
 
-                img_src = driver.find_element_by_css_selector("div.viewer img").get_attribute('src').split('&type')[0]
+                img_src = driver.find_element_by_css_selector(
+                    "div.viewer img").get_attribute('src').split('&type')[0]
                 resp = requests.get(img_src)
                 con_type = resp.headers['Content-Type'].split('/')[1]
+                timestamp = datetime.now().strftime('%m-%d_%H-%M-%S')
 
-                with open(os.path.join(f'./imgs/img{n}.{con_type}'), 'wb') as fp:
+                filename = f'img{n}_{timestamp}.{con_type}'
+
+                with open(os.path.join(f'./imgs/{filename}'), 'wb') as fp:
                     fp.write(resp.content)
-                    print(f'success: img{n}.{con_type}')
+                    print(f'success: {filename}')
             except:
                 print(f'failed: img{n}')
                 n_except += 1
                 pass
         else:
             print(f'\ndownload: {n_round - n_except} files safely done')
-        
+
         driver.close()
-        
+
     def daum_imgs_se(self, n_round=10):
-        import requests, os
+        import requests
+        import os
         from bs4 import BeautifulSoup
         from selenium import webdriver
-        
+        from datetime import datetime
+
         driver = webdriver.Chrome()
-        
+
         url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
         driver.get(url)
-        
+
         n_except = 0
         for n in range(n_round):
             try:
-                driver.find_elements_by_css_selector("div.cont_img div.wrap_thumb")[n].click()
+                driver.find_elements_by_css_selector(
+                    "div.cont_img div.wrap_thumb")[n].click()
 
-                img_src = driver.find_element_by_css_selector("div.cont_viewer img").get_attribute('src')
+                img_src = driver.find_element_by_css_selector(
+                    "div.cont_viewer img").get_attribute('src')
                 resp = requests.get(img_src)
                 con_type = resp.headers['Content-Type'].split('/')[1]
+                timestamp = datetime.now().strftime('%m-%d_%H-%M-%S')
 
-                with open(os.path.join(f'./imgs/img{n}.{con_type}'), 'wb') as fp:
+                filename = f'img{n}_{timestamp}.{con_type}'
+
+                with open(os.path.join(f'./imgs/{filename}'), 'wb') as fp:
                     fp.write(resp.content)
-                    print(f'success: img{n}.{con_type}')
+                    print(f'success: {filename}')
             except:
                 print(f'failed: img{n}')
                 n_except += 1
                 pass
         else:
             print(f'\ndownload: {n_round - n_except} files safely done')
-        
+
         driver.close()
