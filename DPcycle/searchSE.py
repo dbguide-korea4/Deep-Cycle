@@ -29,6 +29,37 @@ class Search:
                 n_except += 1
                 pass
         else:
-            return f'download: {n_round - n_except} files safely done'
-            
+            print(f'\ndownload: {n_round - n_except} files safely done')
+        
+        driver.close()
+        
+    def daum_imgs_se(self, n_round=10):
+        import requests, os
+        from bs4 import BeautifulSoup
+        from selenium import webdriver
+        
+        driver = webdriver.Chrome()
+        
+        url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
+        driver.get(url)
+        
+        n_except = 0
+        for n in range(n_round):
+            try:
+                driver.find_elements_by_css_selector("div.cont_img div.wrap_thumb")[n].click()
+
+                img_src = driver.find_element_by_css_selector("div.cont_viewer img").get_attribute('src')
+                resp = requests.get(img_src)
+                con_type = resp.headers['Content-Type'].split('/')[1]
+
+                with open(os.path.join(f'./imgs/img{n}.{con_type}'), 'wb') as fp:
+                    fp.write(resp.content)
+                    print(f'success: img{n}.{con_type}')
+            except:
+                print(f'failed: img{n}')
+                n_except += 1
+                pass
+        else:
+            print(f'\ndownload: {n_round - n_except} files safely done')
+        
         driver.close()
