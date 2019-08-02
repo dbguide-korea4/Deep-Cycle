@@ -77,3 +77,48 @@ class SearchImgSE:
             print(f'\ndownload: {n_round - n_except} files safely done')
 
         driver.close()
+    def google_imgs_se(self, n_round=10):
+        import requests
+        import time
+        import json, os
+        import urllib.request
+        from bs4 import BeautifulSoup
+        from selenium import webdriver
+        
+        driver = webdriver.Chrome()
+        url= f'https://www.google.com/search?q=={self.query}&tbm=isch'
+        driver.get(url)
+        time.sleep(1)
+        driver.find_elements_by_css_selector("#res #rg_s .rg_el")[1].click()
+        n_except = 0
+        b = 0
+        
+        for n in range(10):
+            try:
+                time.sleep(1)
+                dom = BeautifulSoup(driver.page_source, "lxml")
+                image_url = [_["src"] for _ in dom.select("#irc_cc .irc_mimg a img") if _.has_attr("src")]
+                
+                
+                for a in range(len(image_url)):
+                    try:
+                        url = image_url[a]
+                        outpath = "D:/google_crawling/"
+                        outfile = f"img{a+b+1}.jpg"
+                        if not os.path.isdir(outpath):
+                            os.makedirs(outpath)
+                        urllib.request.urlretrieve(url, outpath+outfile)
+                    except:
+                        pass
+                #time.sleep(1)
+                b = b+a+1
+                driver.find_elements_by_css_selector("#irc-cl #irc-rac")[0].click()
+                time.sleep(1)
+                driver.find_elements_by_css_selector("#irc-cl #irc-rac")[0].click()
+                time.sleep(1)
+                driver.find_elements_by_css_selector("#irc-cl #irc-rac")[0].click()
+            except:
+                print(f'{n}번째에서 failed')
+                pass
+            
+        driver.close()
