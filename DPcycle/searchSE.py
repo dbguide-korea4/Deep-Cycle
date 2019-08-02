@@ -17,18 +17,20 @@ class SearchImgSE:
         n_except = 0
         for n in range(n_round):
             try:
-                driver.find_elements_by_css_selector(
-                    "div.photo_grid div.img_area")[n].click()
+                driver.find_elements_by_css_selector('div.photo_grid div.img_area')[n].click()
 
-                img_src = driver.find_element_by_css_selector(
-                    "div.viewer img").get_attribute('src').split('&type')[0]
+                img_src = driver.find_element_by_css_selector('div.viewer img').get_attribute('src').split('&type')[0]
                 resp = requests.get(img_src)
                 con_type = resp.headers['Content-Type'].split('/')[1]
-                timestamp = datetime.now().strftime('%m-%d_%H-%M-%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
-                filename = f'img{n}_{timestamp}.{con_type}'
+                filename = f'img{timestamp}_{self.query}{n}.{con_type}'
+                path = './imgs/'
+                
+                if not os.path.isdir(path):
+                    os.makedirs(path)
 
-                with open(os.path.join(f'./imgs/{filename}'), 'wb') as fp:
+                with open(os.path.join(f'{path}{filename}'), 'wb') as fp:
                     fp.write(resp.content)
                     print(f'success: {filename}')
             except:
@@ -55,18 +57,20 @@ class SearchImgSE:
         n_except = 0
         for n in range(n_round):
             try:
-                driver.find_elements_by_css_selector(
-                    "div.cont_img div.wrap_thumb")[n].click()
+                driver.find_elements_by_css_selector('div.cont_img div.wrap_thumb')[n].click()
 
-                img_src = driver.find_element_by_css_selector(
-                    "div.cont_viewer img").get_attribute('src')
+                img_src = driver.find_element_by_css_selector('div.cont_viewer img').get_attribute('src')
                 resp = requests.get(img_src)
                 con_type = resp.headers['Content-Type'].split('/')[1]
-                timestamp = datetime.now().strftime('%m-%d_%H-%M-%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
-                filename = f'img{n}_{timestamp}.{con_type}'
+                filename = f'img{timestamp}_{self.query}{n}.{con_type}'
+                path = './imgs/'
+                
+                if not os.path.isdir(path):
+                    os.makedirs(path)
 
-                with open(os.path.join(f'./imgs/{filename}'), 'wb') as fp:
+                with open(os.path.join(f'{path}{filename}'), 'wb') as fp:
                     fp.write(resp.content)
                     print(f'success: {filename}')
             except:
@@ -77,6 +81,7 @@ class SearchImgSE:
             print(f'\ndownload: {n_round - n_except} files safely done')
 
         driver.close()
+
     def google_imgs_se(self, n_round=10):
         import requests
         import time
@@ -93,7 +98,7 @@ class SearchImgSE:
         n_except = 0
         b = 0
         
-        for n in range(10):
+        for n in range(n_round):
             try:
                 time.sleep(1)
                 dom = BeautifulSoup(driver.page_source, "lxml")
