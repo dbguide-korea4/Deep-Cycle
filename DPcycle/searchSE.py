@@ -2,86 +2,86 @@ class SearchImgSE:
     def __init__(self, keywords):
         self.query = '+'.join(keywords.split(' '))
 
-    def naver_imgs_se(self, n_round=10):
-        import requests
-        import os
-        from bs4 import BeautifulSoup
+    @staticmethod
+    def sel_driver(url):
         from selenium import webdriver
-        from datetime import datetime
 
         driver = webdriver.Chrome()
+        driver.get(url)
+        
+        return driver
+    
+    @staticmethod
+    def imgs_save(url, filename):
+        import requests
+        import os
+        
+        path = './imgs/'
+        resp = requests.get(url)
+        con_type = resp.headers['Content-Type'].split('/')[1]
+        
+        if not os.path.isdir(path):
+            os.makedirs(path)
+
+        with open(os.path.join(f'{path}{filename}.{con_type}'), 'wb') as fp:
+            fp.write(resp.content)
+            
+        print(f'success: {filename}.{con_type}')
+
+    def naver_imgs_se(self, n_round=10):
+        from datetime import datetime
 
         url = f'https://search.naver.com/search.naver?where=image&query={self.query}'
-        driver.get(url)
+        driver = self.sel_driver(url)
 
         n_except = 0
         for n in range(n_round):
             try:
                 driver.find_elements_by_css_selector('div.photo_grid div.img_area')[n].click()
-
                 img_src = driver.find_element_by_css_selector('div.viewer img').get_attribute('src').split('&type')[0]
-                resp = requests.get(img_src)
-                con_type = resp.headers['Content-Type'].split('/')[1]
-                timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-
-                filename = f'img{timestamp}_{self.query}{n}.{con_type}'
-                path = './imgs/'
                 
-                if not os.path.isdir(path):
-                    os.makedirs(path)
-
-                with open(os.path.join(f'{path}{filename}'), 'wb') as fp:
-                    fp.write(resp.content)
-                    print(f'success: {filename}')
+                timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                img_name = f'img{timestamp}_{self.query}{n}'
+                
+                self.imgs_save(img_src, img_name)
             except:
                 print(f'failed: img{n}')
                 n_except += 1
                 pass
         else:
+            for i in driver.window_handles:
+                driver.switch_to_window(i)
+                driver.close()
+            
             print(f'\ndownload: {n_round - n_except} files safely done')
 
-        driver.close()
-
     def daum_imgs_se(self, n_round=10):
-        import requests
-        import os
-        from bs4 import BeautifulSoup
-        from selenium import webdriver
         from datetime import datetime
 
-        driver = webdriver.Chrome()
-
         url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
-        driver.get(url)
+        driver = self.sel_driver(url)
 
         n_except = 0
         for n in range(n_round):
             try:
                 driver.find_elements_by_css_selector('div.cont_img div.wrap_thumb')[n].click()
-
                 img_src = driver.find_element_by_css_selector('div.cont_viewer img').get_attribute('src')
-                resp = requests.get(img_src)
-                con_type = resp.headers['Content-Type'].split('/')[1]
+
                 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-
-                filename = f'img{timestamp}_{self.query}{n}.{con_type}'
-                path = './imgs/'
+                img_name = f'img{timestamp}_{self.query}{n}'
                 
-                if not os.path.isdir(path):
-                    os.makedirs(path)
-
-                with open(os.path.join(f'{path}{filename}'), 'wb') as fp:
-                    fp.write(resp.content)
-                    print(f'success: {filename}')
+                self.imgs_save(img_src, img_name)
             except:
                 print(f'failed: img{n}')
                 n_except += 1
                 pass
         else:
+            for i in driver.window_handles:
+                driver.switch_to_window(i)
+                driver.close()
+
             print(f'\ndownload: {n_round - n_except} files safely done')
-
-        driver.close()
-
+    
     def google_imgs_se(self, n_round=10):
         import requests
         import time
