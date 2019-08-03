@@ -1,5 +1,5 @@
 class SearchImgSE:
-    def __init__(self, keywords, path='C:/imgs/'):
+    def __init__(self, keywords, path='.///imgs/'):
         self.query = '+'.join(keywords.split(' '))
         self.path = path
 
