@@ -1,6 +1,7 @@
 class SearchImgSE:
-    def __init__(self, keywords):
+    def __init__(self, keywords, path='.//imgs/'):
         self.query = '+'.join(keywords.split(' '))
+        self.path = path
 
     @staticmethod
     def sel_driver(url):
@@ -12,11 +13,10 @@ class SearchImgSE:
         return driver
     
     @staticmethod
-    def imgs_save(url, filename):
+    def imgs_save(url, filename, path):
         import requests
         import os
         
-        path = './imgs/'
         resp = requests.get(url)
         con_type = resp.headers['Content-Type'].split('/')[1]
         
@@ -43,7 +43,7 @@ class SearchImgSE:
                 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                 img_name = f'img{timestamp}_{self.query}{n}'
                 
-                self.imgs_save(img_src, img_name)
+                self.imgs_save(img_src, img_name, self.path)
             except:
                 print(f'failed: img{n}')
                 n_except += 1
@@ -70,7 +70,7 @@ class SearchImgSE:
                 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                 img_name = f'img{timestamp}_{self.query}{n}'
                 
-                self.imgs_save(img_src, img_name)
+                self.imgs_save(img_src, img_name, self.path)
             except:
                 print(f'failed: img{n}')
                 n_except += 1
@@ -108,11 +108,10 @@ class SearchImgSE:
                 for a in range(len(image_url)):
                     try:
                         url = image_url[a]
-                        outpath = "D:/google_crawling/"
                         outfile = f"img{a+b+1}.jpg"
-                        if not os.path.isdir(outpath):
-                            os.makedirs(outpath)
-                        urllib.request.urlretrieve(url, outpath+outfile)
+                        if not os.path.isdir(self.path):
+                            os.makedirs(self.path)
+                        urllib.request.urlretrieve(url, self.path+outfile)
                     except:
                         pass
                 #time.sleep(1)
