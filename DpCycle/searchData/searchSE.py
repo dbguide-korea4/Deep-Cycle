@@ -45,14 +45,28 @@ class SearchImgSE:
             fp.write(resp.content)
 
         print(f'success: {filename}.{con_type}')
+    
+    @staticmethod
+    def src_to_array(scr):
+        import requests
+        from matplotlib.pylab import imread
+        from io import BytesIO
 
-    def naver_imgs_se(self, n_round=10):
+        resp = requests.get(url)
+        arr = imread(BytesIO(resp.content),
+                    format=resp.headers['Content-Type'].split('/')[1])
+
+        return arr
+
+    def naver_imgs_se(self, n_round=10, down=True):
+        from numpy import array
         from datetime import datetime
 
         url = f'https://search.naver.com/search.naver?where=image&query={self.query}'
         driver = self.sel_driver(url)
 
         img_src = []
+        imgs_arr = []
         n_except = 0
         for n in range(n_round):
             driver.find_elements_by_css_selector(
@@ -61,29 +75,37 @@ class SearchImgSE:
                 'div.viewer img').get_attribute('src').split('&type')[0])
         else:
             for i, src in enumerate(set(img_src)):
-                try:
-                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                    img_name = f'img{timestamp}_{self.query}{i}'
+                if down is True:
+                    try:
+                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                        img_name = f'img{timestamp}_{self.query}{i}'
 
-                    self.imgs_save(src, img_name, self.path)
-                except:
-                    print(f'failed: img{i}')
-                    n_except += 1
-                    pass
+                        self.imgs_save(src, img_name, self.path)
+                    except:
+                        print(f'failed: img{i}')
+                        n_except += 1
+                        pass
+                else:
+                    imgs_arr.append(self.src_to_array(src))
 
         for window in driver.window_handles:
                 driver.switch_to_window(window)
                 driver.close()
 
-        print(f'\ndownload: {n_round - n_except} files safely done')
+        if down is False:
+            return array(imgs_arr)
+        
+        print(f'\n{n_round - n_except} files safely done')
 
-    def daum_imgs_se(self, n_round=10):
+    def daum_imgs_se(self, n_round=10, down=True):
+        from numpy import array
         from datetime import datetime
 
         url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
         driver = self.sel_driver(url)
 
         img_src = []
+        imgs_arr = []
         n_except = 0
         for n in range(n_round):
             driver.find_elements_by_css_selector(
@@ -92,24 +114,32 @@ class SearchImgSE:
                 'div.cont_viewer img').get_attribute('src'))
         else:
             for i, src in enumerate(set(img_src)):
-                try:
-                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                    img_name = f'img{timestamp}_{self.query}{i}'
+                if down is True:
+                    try:
+                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                        img_name = f'img{timestamp}_{self.query}{i}'
 
-                    self.imgs_save(src, img_name, self.path)
-                except:
-                    print(f'failed: img{i}')
-                    n_except += 1
-                    pass
+                        self.imgs_save(src, img_name, self.path)
+                    except:
+                        print(f'failed: img{i}')
+                        n_except += 1
+                        pass
+                else:
+                    imgs_arr.append(self.src_to_array(src))
+
 
         for window in driver.window_handles:
             driver.switch_to_window(window)
             driver.close()
 
+        if down is False:
+            return array(imgs_arr)
+
         print(f'\ndownload: {n_round - n_except} files safely done')
 
-    def google_imgs_se(self, n_round=10):
+    def google_imgs_se(self, n_round=10, down=True):
         from bs4 import BeautifulSoup
+        from numpy import array
         from datetime import datetime
 
         url = f'https://www.google.com/search?q={self.query}&tbm=isch'
@@ -117,6 +147,7 @@ class SearchImgSE:
         driver.find_element_by_css_selector('div#rg_s div.rg_el').click()
 
         img_src = []
+        imgs_arr = []
         n_except = 0
         for n in range(n_round):
             dom = BeautifulSoup(driver.page_source, "lxml")
@@ -126,18 +157,24 @@ class SearchImgSE:
             driver.find_element_by_css_selector('#irc-cl #irc-rac').click()
         else:
             for i, src in enumerate(set(img_src)):
-                try:
-                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                    img_name = f'img{timestamp}_{self.query}{i}'
+                if down is True:
+                    try:
+                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                        img_name = f'img{timestamp}_{self.query}{i}'
 
-                    self.imgs_save(src, img_name, self.path)
-                except:
-                    print(f'failed: img{i}')
-                    n_except += 1
-                    pass
+                        self.imgs_save(src, img_name, self.path)
+                    except:
+                        print(f'failed: img{i}')
+                        n_except += 1
+                        pass
+                else:
+                    imgs_arr.append(self.src_to_array(src))
 
         for window in driver.window_handles:
                 driver.switch_to_window(window)
                 driver.close()
+        
+        if down is False:
+            return array(imgs_arr)
 
         print(f'\ndownload: {n_round - n_except} files safely done')
