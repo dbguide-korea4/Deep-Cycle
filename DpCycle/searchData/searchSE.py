@@ -47,7 +47,7 @@ class SearchImgSE:
         print(f'success: {filename}.{con_type}')
     
     @staticmethod
-    def src_to_array(scr):
+    def src_to_array(src):
         import requests
         from matplotlib.pylab import imread
         from io import BytesIO
