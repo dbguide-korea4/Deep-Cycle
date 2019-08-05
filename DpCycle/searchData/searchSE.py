@@ -135,7 +135,7 @@ class SearchImgSE:
         if down is False:
             return array(imgs_arr)
 
-        print(f'\ndownload: {n_round - n_except} files safely done')
+        print(f'\n{n_round - n_except} files safely done')
 
     def google_imgs_se(self, n_round=10, down=True):
         from bs4 import BeautifulSoup
@@ -177,4 +177,4 @@ class SearchImgSE:
         if down is False:
             return array(imgs_arr)
 
-        print(f'\ndownload: {n_round - n_except} files safely done')
+        print(f'\n{n_round - n_except} files safely done')
