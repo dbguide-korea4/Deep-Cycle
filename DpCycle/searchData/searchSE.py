@@ -1,7 +1,7 @@
 class SearchImgSE:
     def __init__(self, keywords, path=None):
         self.query = '+'.join(keywords.split(' '))
-        self.path = self.get_download_path()
+        self.path = self.get_download_path() if path is None else path
 
     @staticmethod
     def get_download_path():
