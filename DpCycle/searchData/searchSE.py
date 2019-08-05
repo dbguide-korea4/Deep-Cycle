@@ -52,7 +52,7 @@ class SearchImgSE:
         from matplotlib.pylab import imread
         from io import BytesIO
 
-        resp = requests.get(url)
+        resp = requests.get(src)
         arr = imread(BytesIO(resp.content),
                     format=resp.headers['Content-Type'].split('/')[1])
 
