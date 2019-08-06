@@ -136,7 +136,7 @@ class SearchImgSE:
         for n in range(n_round):
             dom = BeautifulSoup(driver.page_source, "lxml")
             img_src.extend([_['src'] for _ in dom.select(
-                'div.cont_viewer div.inner_thumb img') if _.has_attr('src')])
+                'div.cont_viewer div.inner_thumb img:last-child') if _.has_attr('src')])
 
             try:
                 driver.find_element_by_css_selector('a.btn_next').click()
