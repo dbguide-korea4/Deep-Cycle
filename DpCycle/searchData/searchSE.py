@@ -171,7 +171,9 @@ class SearchImgSE:
         total = len(img_src) - n_except
         print(f'\n{total if total>0 else 0} files safely done')
 
-    def google_imgs_se(self, n_round=10, down=True):
+    def google_imgs_se(self, down=True):
+        import time
+        import json
         from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
@@ -179,48 +181,51 @@ class SearchImgSE:
 
         url = f'https://www.google.com/search?q={self.query}&tbm=isch'
         driver = self.sel_driver(url)
-        driver.find_element_by_css_selector('div#rg_s div.rg_el').click()
 
         print('Collecting images...')
 
-        img_src = []
         imgs_arr = []
         n_except = 0
-        for n in range(n_round):
-            dom = BeautifulSoup(driver.page_source, "lxml")
+        total = 0
+        SCROLL_PAUSE_TIME = 0.5
 
-            try:
-                driver.find_element_by_css_selector('#irc-cl #irc-rac').click()
-            except NoSuchElementException as e:
-                driver.find_element_by_css_selector('input.ksb').click()
-                driver.find_elements_by_css_selector(
-                    'div#rg_s div.rg_el')[n].click()
-            except:
-                pass
-            finally:
-                img_src.extend([_['src'] for _ in dom.select(
-                    'div#irc_cc div.irc_mimg img') if _.has_attr('src')])
+        last_height = driver.execute_script('return document.body.scrollHeight')
+        while True:
+            driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+
+            time.sleep(SCROLL_PAUSE_TIME)
+
+            new_height = driver.execute_script('return document.body.scrollHeight')
+            if new_height == last_height:
+                try:
+                    driver.find_element_by_css_selector('input#smb').click()
+                except:
+                    break
+            last_height = new_height
+
+        dom = BeautifulSoup(driver.page_source, 'lxml')
+        img_src = {json.loads(_.text)['ou'] for _ in dom.find_all('div', {'class':'rg_meta'})}
+            
+        self.closed_sel_windows(driver)
+        print(f'Downloading {len(img_src)} images...')
+
+        for i, src in enumerate(img_src):
+            if down is True:
+                try:
+                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                    img_name = f'img{timestamp}_{self.query}{i}'
+
+                    self.imgs_save(src, img_name, self.path)
+                except:
+                    print(f'failed: img{i}')
+                    n_except += 1
+                    pass
+            else:
+                imgs_arr.append(self.src_to_array(src))
         else:
-            img_src = set(img_src)
-            self.closed_sel_windows(driver)
-            print(f'Downloading {len(img_src)} images...')
-
-            for i, src in enumerate(img_src):
-                if down is True:
-                    try:
-                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                        img_name = f'img{timestamp}_{self.query}{i}'
-
-                        self.imgs_save(src, img_name, self.path)
-                    except:
-                        print(f'failed: img{i}')
-                        n_except += 1
-                        pass
-                else:
-                    imgs_arr.append(self.src_to_array(src))
+            total = len(img_src) - n_except
         
         if down is False:
             return array(imgs_arr)
 
-        total = len(img_src) - n_except
         print(f'\n{total if total>0 else 0} files safely done')
