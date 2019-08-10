@@ -21,6 +21,9 @@ dropzone = Dropzone(app)
 @app.route('/', methods=['POST', 'GET'])
 def upload():
     if request.method == 'POST':
+        if not os.path.isdir(app.config['UPLOADED_PATH']):
+            os.makedirs(app.config['UPLOADED_PATH'])
+            
         f = request.files.get('file')
         f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
 
