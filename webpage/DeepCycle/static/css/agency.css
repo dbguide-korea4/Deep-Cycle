@@ -36,7 +36,7 @@ h6 {
 }
 
 .page-section {
-    padding: 120px 0;
+    padding: 100px 0;
 }
 
 .page-section h2.section-heading {
@@ -607,6 +607,10 @@ header.masthead .intro-text .intro-heading {
 
 .team-member p {
     margin-top: 0;
+}
+
+h1, h2 {
+    margin-top: 5px;
 }
 
 section#contact {
