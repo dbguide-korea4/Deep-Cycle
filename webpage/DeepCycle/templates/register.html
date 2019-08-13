@@ -128,29 +128,30 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title text-center">회원가입</h5>
-                        <form class="form-signin">
+                        <form action="/register" method="POST" class="form-signin">
                             <div class="form-label-group">
-                                <input type="text" name="id" id="inputID" class="form-control" placeholder="ID" required autofocus>
-                                <label for="id">ID</label>
+                                <input type="text" name="id" id="inputID" class="form-control" placeholder="ID" required
+                                    autofocus>
+                                <label for="inputID">ID</label>
                             </div>
 
                             <div class="form-label-group">
-                                <input type="text" name="user_name" id="inputUserame" class="form-control" placeholder="Username"
-                                    required>
+                                <input type="text" name="user_name" id="inputUserame" class="form-control"
+                                    placeholder="Username" required>
                                 <label for="inputUserame">Username</label>
                             </div>
 
                             <div class="form-label-group">
-                                <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address"
-                                    required>
+                                <input type="email" name="user_email" id="inputEmail" class="form-control"
+                                    placeholder="Email address" required>
                                 <label for="inputEmail">Email address</label>
                             </div>
 
                             <hr>
 
                             <div class="form-label-group">
-                                <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password"
-                                    required>
+                                <input type="password" name="password" id="inputPassword" class="form-control"
+                                    placeholder="Password" required>
                                 <label for="inputPassword">Password</label>
                             </div>
 
@@ -160,8 +161,7 @@
                                 <label for="inputConfirmPassword">Confirm password</label>
                             </div>
 
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase"
-                                type="submit">회원가입</button>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">회원가입</button>
                             <a class="d-block text-center mt-2 small" href="/login">로그인</a>
                         </form>
                     </div>

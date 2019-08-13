@@ -1,13 +1,13 @@
 import os
 
 from models import db, UserTable
-from flask import Flask, render_template, request, redirect, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
 
-basedir = os.path.abspath(os.path.dirname(__file__))  # 현재 작업하고 있는 절대경로.
+# 현재 작업하고 있는 절대경로.
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
@@ -22,7 +22,7 @@ app.config.update(  # app.config : 설정. update는 기존 설정을 업데이�
     DROPZONE_DEFAULT_MESSAGE='Click or Drop your Image'
 )
 app.secret_key = 'anything'
-#db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 db.init_app(app)
 admin = Admin(app, name="UserTable View")
@@ -39,13 +39,24 @@ admin.add_view(MyModelView(UserTable, db.session))
 
 
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def index():
     if not session.get('logged_in'):
         return render_template('index.html')
     else:
         if request.method == 'POST':
             return render_template('index.html')
         return render_template('index.html')
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        if not os.path.isdir(app.config['UPLOADED_PATH']):
+            os.makedirs(app.config['UPLOADED_PATH'])
+
+        f = request.files.get('file')
+        f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,17 +94,6 @@ def register():
         db.session.commit()
         return render_template('index.html')
     return render_template('register.html')
-
-
-@app.route('/uploads', methods=['POST', 'GET'])
-def upload():
-    if request.method == 'POST':
-        if not os.path.isdir(app.config['UPLOADED_PATH']):
-            os.makedirs(app.config['UPLOADED_PATH'])
-
-        f = request.files.get('file')
-        f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
-    return render_template('index.html')
 
 
 @app.route('/completed')

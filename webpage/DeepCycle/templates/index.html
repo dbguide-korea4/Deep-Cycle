@@ -2,8 +2,7 @@
 {% block head %}
 {{ dropzone.load_css() }}
 <!-- 필수 아님(코드에 써도 됨)-->
-{{ dropzone.style("border: 1.5px dashed #ced4da; margin: 10%; min-height: 200px; border-radius: .25rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;") }}
+{{ dropzone.style("border: 1.5px dashed #ced4da; margin: 10%; min-height: 200px; border-radius: .25rem;") }}
 {% endblock %}
 
 {% block content %}
@@ -30,7 +29,7 @@
                 <!-- 데이터가 들어오면 정보를 출력할 부분 -->
             </div>
             <div class="col-md-6">
-                {{ dropzone.create("/") }}
+                {{ dropzone.create("/upload") }}
             </div>
         </div>
         <div class="row-lg text-center">

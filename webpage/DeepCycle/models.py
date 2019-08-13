@@ -5,9 +5,7 @@ from sqlalchemy.schema import FetchedValue
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
-
 
 # t_sqlite_sequence = db.Table(
 #     'sqlite_sequence',
@@ -27,7 +25,6 @@ class UserFile(db.Model):
                       server_default=db.FetchedValue())
     date = db.Column(db.DateTime, nullable=False,
                      server_default=db.FetchedValue())
-
     user = db.relationship(
         'UserTable', primaryjoin='UserFile.user_id == UserTable.id', backref='user_files')
 
