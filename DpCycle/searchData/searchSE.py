@@ -4,6 +4,19 @@ class SearchImgSE:
         self.path = self.get_download_path() if path is None else path
 
     @staticmethod
+    def progress_bar(value, endvalue, stamp, bar_length=50):
+        import sys
+        import time
+
+        percent = float(value) / endvalue
+        arrow = '-' * int(round(percent * bar_length)-1) + '>'
+        spaces = ' ' * (bar_length - len(arrow))
+
+        sys.stdout.write('\rPercent: [{0}] {1}%  Time: {2}'.format(
+            arrow + spaces, int(round(percent * 100)), time.strftime('%M:%S', time.gmtime(stamp))))
+        sys.stdout.flush()
+
+    @staticmethod
     def get_download_path():
         import os
         """Returns the default downloads path for linux or windows"""
@@ -51,7 +64,7 @@ class SearchImgSE:
             fp.write(resp.content)
 
         print(f'success: {filename}.{con_type}')
-    
+
     @staticmethod
     def src_to_array(src):
         import requests
@@ -60,16 +73,18 @@ class SearchImgSE:
 
         resp = requests.get(src)
         arr = imread(BytesIO(resp.content),
-                    format=resp.headers['Content-Type'].split('/')[1])
+                     format=resp.headers['Content-Type'].split('/')[1])
 
         return arr
 
     def naver_imgs_se(self, n_round=10, down=True):
+        import time
         from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
+        tic = time.time()
         url = f'https://search.naver.com/search.naver?where=image&query={self.query}'
         driver = self.sel_driver(url)
         driver.find_element_by_css_selector(
@@ -81,48 +96,60 @@ class SearchImgSE:
         imgs_arr = []
         n_except = 0
         for n in range(n_round):
-            dom = BeautifulSoup(driver.page_source, "lxml")
-            img_src.extend([_['src'] for _ in dom.select(
-                'div.viewer img') if _.has_attr('src')])
-
             try:
-                driver.find_element_by_css_selector(
-                    'div.viewer_content a.btn_next span').click()
-            except NoSuchElementException as e:
-                driver.find_element_by_css_selector('a.btn_more').click()
-            except:
-                pass
-        else:
-            img_src = set(img_src)
-            self.closed_sel_windows(driver)
-            print(f'Downloading {len(img_src)} images...')
+                dom = BeautifulSoup(driver.page_source, 'lxml')
+                img_src.extend([_['src'] for _ in dom.select(
+                    'div.viewer img') if _.has_attr('src')])
 
-            for i, src in enumerate(img_src):
-                if down is True:
-                    try:
-                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                        img_name = f'img{timestamp}_{self.query}{i}'
+                self.progress_bar(n+1, n_round, time.time()-tic)
 
-                        self.imgs_save(src, img_name, self.path)
-                    except:
-                        print(f'failed: img{i}')
-                        n_except += 1
-                        pass
-                else:
-                    imgs_arr.append(self.src_to_array(src))
+                try:
+                    driver.find_element_by_css_selector(
+                        'div.viewer_content a.btn_next span').click()
+                except NoSuchElementException:
+                    driver.find_element_by_css_selector(
+                        'a.btn_more').click()
+                except:
+                    pass
+            except KeyboardInterrupt:
+                print('\nStop collecting!')
+                break
 
-        if down is False:
-            return array(imgs_arr)
+        img_src = set(img_src)
+        self.closed_sel_windows(driver)
+        print(f'\n\nDownloading {len(img_src)} images...')
+
+        for i, src in enumerate(img_src):
+            if down is True:
+                try:
+                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                    img_name = f'img{timestamp}_{self.query}{i}'
+
+                    self.imgs_save(src, img_name, self.path)
+                except KeyboardInterrupt:
+                    print('\nStop downloading!')
+                    break
+                except:
+                    print(f'failed: img{i}')
+                    n_except += 1
+                    pass
+            else:
+                imgs_arr.append(self.src_to_array(src))
 
         total = len(img_src) - n_except
         print(f'\n{total if total>0 else 0} files safely done')
 
+        if down is False:
+            return array(imgs_arr)
+
     def daum_imgs_se(self, n_round=10, down=True):
+        import time
         from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
+        tic = time.time()
         url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
         driver = self.sel_driver(url)
         driver.find_element_by_css_selector(
@@ -134,42 +161,52 @@ class SearchImgSE:
         imgs_arr = []
         n_except = 0
         for n in range(n_round):
-            dom = BeautifulSoup(driver.page_source, "lxml")
-            img_src.extend([_['src'] for _ in dom.select(
-                'div.cont_viewer div.inner_thumb img:last-child') if _.has_attr('src')])
-
             try:
-                driver.find_element_by_css_selector('a.btn_next').click()
-            except NoSuchElementException as e:
-                driver.find_element_by_css_selector('a.expender.open').click()
-                driver.find_elements_by_css_selector(
-                    'div.cont_img div.wrap_thumb')[n].click()
-            except:
-                pass
-        else:
-            img_src = set(img_src)
-            self.closed_sel_windows(driver)
-            print(f'Downloading {len(img_src)} images...')
+                dom = BeautifulSoup(driver.page_source, 'lxml')
+                img_src.extend([_['src'] for _ in dom.select(
+                    'div.cont_viewer div.inner_thumb img:last-child') if _.has_attr('src')])
 
-            for i, src in enumerate(img_src):
-                if down is True:
-                    try:
-                        timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-                        img_name = f'img{timestamp}_{self.query}{i}'
+                self.progress_bar(n+1, n_round, time.time()-tic)
 
-                        self.imgs_save(src, img_name, self.path)
-                    except:
-                        print(f'failed: img{i}')
-                        n_except += 1
-                        pass
-                else:
-                    imgs_arr.append(self.src_to_array(src))
+                try:
+                    driver.find_element_by_css_selector('a.btn_next').click()
+                except NoSuchElementException as e:
+                    driver.find_element_by_css_selector(
+                        'a.expender.open').click()
+                    driver.find_elements_by_css_selector(
+                        'div.cont_img div.wrap_thumb')[n].click()
+                except:
+                    pass
+            except KeyboardInterrupt:
+                print('\nStop collecting!')
+                break
 
-        if down is False:
-            return array(imgs_arr)
+        img_src = set(img_src)
+        self.closed_sel_windows(driver)
+        print(f'\n\nDownloading {len(img_src)} images...')
+
+        for i, src in enumerate(img_src):
+            if down is True:
+                try:
+                    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+                    img_name = f'img{timestamp}_{self.query}{i}'
+
+                    self.imgs_save(src, img_name, self.path)
+                except KeyboardInterrupt:
+                    print('\nStop downloading!')
+                    break
+                except:
+                    print(f'failed: img{i}')
+                    n_except += 1
+                    pass
+            else:
+                imgs_arr.append(self.src_to_array(src))
 
         total = len(img_src) - n_except
         print(f'\n{total if total>0 else 0} files safely done')
+
+        if down is False:
+            return array(imgs_arr)
 
     def google_imgs_se(self, down=True):
         import time
@@ -179,6 +216,7 @@ class SearchImgSE:
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
+        tic = time.time()
         url = f'https://www.google.com/search?q={self.query}&tbm=isch'
         driver = self.sel_driver(url)
 
@@ -186,26 +224,32 @@ class SearchImgSE:
 
         imgs_arr = []
         n_except = 0
-        total = 0
-        SCROLL_PAUSE_TIME = 0.5
+        stamp = 0
 
-        last_height = driver.execute_script('return document.body.scrollHeight')
+        last_height = driver.execute_script(
+            'return document.body.scrollHeight')
         while True:
-            driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+            driver.execute_script(
+                'window.scrollTo(0, document.body.scrollHeight);')
 
-            time.sleep(SCROLL_PAUSE_TIME)
+            time.sleep(0.5)
 
-            new_height = driver.execute_script('return document.body.scrollHeight')
+            new_height = driver.execute_script(
+                'return document.body.scrollHeight')
             if new_height == last_height:
                 try:
                     driver.find_element_by_css_selector('input#smb').click()
                 except:
+                    stamp = time.time() - tic
                     break
             last_height = new_height
 
+        print('Time: ', time.strftime('%M:%S', time.gmtime(stamp)))
+
         dom = BeautifulSoup(driver.page_source, 'lxml')
-        img_src = {json.loads(_.text)['ou'] for _ in dom.find_all('div', {'class':'rg_meta'})}
-            
+        img_src = {json.loads(_.text)['ou'] for _ in dom.find_all(
+            'div', {'class': 'rg_meta'})}
+
         self.closed_sel_windows(driver)
         print(f'Downloading {len(img_src)} images...')
 
@@ -216,16 +260,18 @@ class SearchImgSE:
                     img_name = f'img{timestamp}_{self.query}{i}'
 
                     self.imgs_save(src, img_name, self.path)
+                except KeyboardInterrupt:
+                    print('\nStop downloading!')
+                    break
                 except:
                     print(f'failed: img{i}')
                     n_except += 1
                     pass
             else:
                 imgs_arr.append(self.src_to_array(src))
-        else:
-            total = len(img_src) - n_except
-        
+
+        total = len(img_src) - n_except
+        print(f'\n{total if total>0 else 0} files safely done')
+
         if down is False:
             return array(imgs_arr)
-
-        print(f'\n{total if total>0 else 0} files safely done')
