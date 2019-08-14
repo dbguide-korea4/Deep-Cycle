@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 {% block head %}
+<style>
+    @font-face {
+        font-family: 'Dohyen';
+        src: url("../static/font/DoHyeon.ttf");
+    }
+</style>
 {{ dropzone.load_css() }}
 <!-- 필수 아님(코드에 써도 됨)-->
 {{ dropzone.style("border: 1.5px dashed #ced4da; margin: 10%; min-height: 200px; border-radius: .25rem;") }}
@@ -33,7 +39,9 @@
             </div>
         </div>
         <div class="row-lg text-center">
+            <!-- <form action="complete"> -->
             <button id="upload" class="btn btn-primary btn-xl text-uppercase" type="submit">Upload</button>
+            <!-- </form> -->
         </div>
     </article>
 </section>

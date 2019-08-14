@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Deep_cycle</title>
+</head>
+<body>
+{% extends "base.html" %}
+{% block content %}
+{% if session['logged_in'] %}
+
+        <a href="/logout">Logout</a>
+
+{% else %}
+<p>Not login!</p>
+
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+
+{% endif %}
+{% endblock %}
+</body>
+</html>
