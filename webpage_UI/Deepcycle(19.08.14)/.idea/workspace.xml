@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="57dc893a-912b-4666-9658-2f1c76082326" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Flask Main" />
+        <option value="CSS File" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1P5h2A0vb2rGlJ2fqbvUewiDZOq" />
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cdetg\PycharmProjects\Deepcycle(2)\static" />
+      <recent name="C:\Users\cdetg\PycharmProjects\Deepcycle(2)\static\img" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Deepcycle(2)" type="Python.FlaskServer">
+      <module name="Deepcycle(2)" />
+      <option name="target" value="$PROJECT_DIR$/app.py" />
+      <option name="targetType" value="PATH" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="57dc893a-912b-4666-9658-2f1c76082326" name="Default Changelist" comment="" />
+      <created>1565169654819</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1565169654819</updated>
+      <workItem from="1565169655985" duration="826000" />
+      <workItem from="1565170513182" duration="1817000" />
+      <workItem from="1565172356592" duration="1560000" />
+      <workItem from="1565179327015" duration="158000" />
+      <workItem from="1565180180732" duration="9000" />
+      <workItem from="1565180211743" duration="58000" />
+      <workItem from="1565225856740" duration="145000" />
+      <workItem from="1565226015870" duration="47000" />
+      <workItem from="1565226075988" duration="69000" />
+      <workItem from="1565226158894" duration="98000" />
+      <workItem from="1565226271820" duration="392000" />
+      <workItem from="1565226709052" duration="28000" />
+      <workItem from="1565248069246" duration="4692000" />
+      <workItem from="1565263866124" duration="95000" />
+      <workItem from="1565264942989" duration="2019000" />
+      <workItem from="1565268996793" duration="38000" />
+      <workItem from="1565269141936" duration="385000" />
+      <workItem from="1565269622596" duration="2971000" />
+      <workItem from="1565312614712" duration="7122000" />
+      <workItem from="1565320132908" duration="1994000" />
+      <workItem from="1565326790564" duration="1901000" />
+      <workItem from="1565330610288" duration="610000" />
+      <workItem from="1565332509535" duration="1044000" />
+      <workItem from="1565500117175" duration="738000" />
+      <workItem from="1565501333161" duration="7385000" />
+      <workItem from="1565574531522" duration="688000" />
+      <workItem from="1565611649298" duration="6129000" />
+      <workItem from="1565657873400" duration="654000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Deepcycle_2_$Deepcycle_2_.coverage" NAME="Deepcycle(2) Coverage Results" MODIFIED="1565618268173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

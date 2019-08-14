@@ -1,0 +1,15 @@
+h2 {
+    margin-top: 100px;
+}
+
+h3 {
+    margin-top: 70px;
+}
+
+
+
+body {
+    background-image: url("../photo/plant.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
