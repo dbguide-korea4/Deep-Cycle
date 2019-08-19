@@ -63,7 +63,7 @@ def create_plot():
 
 
 @app.route('/')
-def index():
+def home():
     bar = create_plot()
     return render_template('index.html', plot=bar)
 
@@ -77,7 +77,7 @@ def upload():
         for key, f in request.files.items():
             if key.startswith('file'):
                 f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
-    return render_template('index.html')
+    return redirect(url_for('home'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -113,7 +113,7 @@ def register():
                              name=request.form['user_name'], email=request.form['user_email'])
         db.session.add(new_user)
         db.session.commit()
-        return render_template('index.html')
+        return redirect(url_for('home'))
     return render_template('register.html')
 
 
