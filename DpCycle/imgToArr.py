@@ -12,6 +12,6 @@ def path_to_array(img_path):
     import numpy
     from PIL import Image
 
-    arr = numpy.array(Image.open(img_path))
+    arr = numpy.array(Image.open(img_path).convert('RGB'))
 
     return arr
