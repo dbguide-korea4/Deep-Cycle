@@ -1,6 +1,6 @@
 def url_to_array(url):
     import requests
-    from matplotlib.pylab import imread
+    from matplotlib.pyplot import imread
     from io import BytesIO
 
     resp = requests.get(url)
