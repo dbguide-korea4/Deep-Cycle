@@ -5,10 +5,16 @@
         font-family: 'Dohyen';
         src: url("../static/font/DoHyeon.ttf");
     }
+    .modebar-btn--logo {
+        display: none;
+    }
 </style>
 {{ dropzone.load_css() }}
 <!-- 필수 아님(코드에 써도 됨)-->
 {{ dropzone.style("border: 1.5px dashed #ced4da; margin: 10%; min-height: 200px; border-radius: .25rem;") }}
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -42,6 +48,16 @@
             <!-- <form action="complete"> -->
             <button id="upload" class="btn btn-primary btn-xl text-uppercase" type="submit">Upload</button>
             <!-- </form> -->
+        </div>
+    </article>
+</section>
+<section class="page-section">
+    <article class="container">
+        <div class="chart" id="bargraph">
+            <script>
+                var graphs = {{ plot | safe }};
+                Plotly.plot('bargraph', graphs, {});
+            </script>
         </div>
     </article>
 </section>

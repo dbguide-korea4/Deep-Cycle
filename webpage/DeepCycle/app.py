@@ -1,4 +1,10 @@
 import os
+import plotly
+import plotly.graph_objs as go
+
+import pandas as pd
+import numpy as np
+import json
 
 from models import db, UserTable
 from flask import Flask, render_template, request, redirect, session, url_for
@@ -39,14 +45,27 @@ class MyModelView(ModelView):
 admin.add_view(MyModelView(UserTable, db.session))
 
 
+def create_plot():
+    N = 40
+    x = np.linspace(0, 1, N)
+    y = np.random.randn(N)
+    df = pd.DataFrame({'x': x, 'y': y})  # creating a sample dataframe
+
+    data = [
+        go.Bar(
+            x=df['x'],  # assign x as the dataframe column 'x'
+            y=df['y']
+        )
+    ]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return graphJSON
+
+
 @app.route('/')
-def index():
-    # if not session.get('logged_in'):
-    #     return render_template('index.html')
-    # else:
-    #     if request.method == 'POST':
-    #         return render_template('index.html')
-    return render_template('index.html')
+def home():
+    bar = create_plot()
+    return render_template('index.html', plot=bar)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -58,7 +77,7 @@ def upload():
         for key, f in request.files.items():
             if key.startswith('file'):
                 f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
-    return render_template('index.html')
+    return redirect(url_for('home'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -94,7 +113,7 @@ def register():
                              name=request.form['user_name'], email=request.form['user_email'])
         db.session.add(new_user)
         db.session.commit()
-        return render_template('index.html')
+        return redirect(url_for('home'))
     return render_template('register.html')
 
 
