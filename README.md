@@ -10,4 +10,4 @@ ___
 ## How to use
 
 1. python 3.6버전을 설치 후 setup.py를 실행하여 환경을 맞춰준다.
-2. ./webpage/Mask_RCNN폴더에 weight를 넣는다. [model weight download](https://drive.google.com/open?id=10uCfH_fDPMDsdsnkuejJ1CoqM903hHzg)
+2. DpCycle/Mask_RCNN폴더에 weight를 넣는다. [model weight download](https://drive.google.com/open?id=10uCfH_fDPMDsdsnkuejJ1CoqM903hHzg)
