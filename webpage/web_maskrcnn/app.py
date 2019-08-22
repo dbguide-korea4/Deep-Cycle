@@ -33,8 +33,6 @@ APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 server = flask.Flask(__name__)
 app = dash.Dash(__name__, server=server)
 
-model = LoadModel()
-
 #############################################################
 
 
@@ -132,6 +130,8 @@ def store_image_string(string_image, key_name):
 def serve_layout():
     # Generates a session ID
     session_id = str(uuid.uuid4())
+    global model;
+    model = LoadModel()
 
     # Post the image to the right key, inside the bucket named after the
     # session ID

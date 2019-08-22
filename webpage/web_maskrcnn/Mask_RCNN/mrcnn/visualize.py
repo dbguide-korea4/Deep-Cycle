@@ -6,9 +6,6 @@ Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
-
-import os
-import sys
 import random
 import itertools
 import colorsys
@@ -161,7 +158,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if save:
-        return fig.savefig('../images/result.png')
+        plt.savefig('./images/result.png')
     if auto_show:
         plt.show()
 

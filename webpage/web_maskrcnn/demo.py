@@ -1,7 +1,6 @@
 # Commented out IPython magic to ensure Python compatibility.
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image
 
 from Mask_RCNN import temp
@@ -20,7 +19,7 @@ class LoadModel():
         import Mask_RCNN.mrcnn.model as modellib
 
         # Root directory of the project
-        ROOT_DIR = os.path.abspath("./Mask_RCNN")
+        ROOT_DIR = os.path.abspath("./")
 
         # Directory to save logs and trained model
         MODEL_DIR = os.path.join(ROOT_DIR, "logs")
@@ -51,25 +50,24 @@ class LoadModel():
         # Load a random image from the images folder
         # file_names = next(os.walk(IMAGE_DIR))[2]
         
-        if IMAGE_DIR is not None:
-            file_list = [f'{path}/{file}' for path, _,
-                     files in os.walk(IMAGE_DIR) for file in files if 'upload' in file]
+        if pil is not None:
+            pil = pil
+        else:
+            file_list = [f'{path}/{file}' for path, _, files in os.walk(IMAGE_DIR) for file in files if 'upload' in file]
             file_name = file_list[-1]
             pil = Image.open(file_name).convert('RGB')
-        else:
-            pil = pil
         
         image = np.array(pil)
         # Run detection
-        results = model.detect([image], verbose=1)
+        results = self.model.detect([image], verbose=1)
 
         # Visualize results
         r = results[0]
         print(r['class_ids'])
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'])
+        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], self.class_names, r['scores'], save=True)
 
         file_list = [f'{path}/{file}' for path, _,
-                     files in os.walk(IMAGE_DIR) for file in files if 'result' in file]
+                     files in os.walk('./images') for file in files if 'result' in file]
         file_name = file_list[-1]
         r_pil = Image.open(file_name)
         return r_pil
