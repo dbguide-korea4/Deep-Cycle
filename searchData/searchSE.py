@@ -60,10 +60,13 @@ class SearchImgSE:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        with open(os.path.join(f'{path}{filename}.{con_type}'), 'wb') as fp:
-            fp.write(resp.content)
+        if con_type.lower() in ['jpg', 'jpeg', 'png']:
+            with open(f'{path}{filename}.{con_type}', 'wb') as fp:
+                fp.write(resp.content)
 
-        print(f'success: {filename}.{con_type}')
+            print(f'success: {filename}.{con_type}')
+        else:
+            raise
 
     @staticmethod
     def src_to_array(src):
