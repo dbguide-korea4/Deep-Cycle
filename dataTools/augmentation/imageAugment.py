@@ -41,7 +41,8 @@ class ImgAugment:
         files = os.listdir(self.path_imgs)
         img_files = [_ for _ in files if _.split(
             ".")[-1].lower() in self.img_type]
-        with open(os.path.join(self.path_imgs, [_ for _ in files if _.split('.')[-1] in 'json'][0]), "r", encoding='utf-8') as f:
+        content_name = [_ for _ in files if _.split('.')[-1] in 'json'][0]
+        with open(os.path.join(self.path_imgs, content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
 
         print(
@@ -112,7 +113,7 @@ class ImgAugment:
             raw_content.update(content)
 
             # 합본 json파일을 저장합니다.
-            with open(os.path.join(path_result, 'flip_via_region_data.json'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(path_result, f'flip_{content_name}'), 'w', encoding='utf-8') as f:
                 json.dump(raw_content, f)
 
         print(f'Flip된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
@@ -130,7 +131,8 @@ class ImgAugment:
         files = os.listdir(self.path_imgs)
         img_files = [_ for _ in files if _.split(
             ".")[-1].lower() in self.img_type]
-        with open(os.path.join(self.path_imgs, [_ for _ in files if _.split('.')[-1] in 'json'][0]), "r", encoding='utf-8') as f:
+        content_name = [_ for _ in files if _.split('.')[-1] in 'json'][0]
+        with open(os.path.join(self.path_imgs, content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
 
         print(
@@ -138,7 +140,6 @@ class ImgAugment:
 
         aug = Grayscale(alpha=1)  # 그레이스케일
         # 그레이스케일된 이미지의 json파일을 만들어주기 위해 기존 content를 복사합니다.
-        raw_content = copy.deepcopy(content)
 
         # 이미지 개수만큼 반복
         for n, img_name in enumerate(img_files, 1):
@@ -164,9 +165,8 @@ class ImgAugment:
                 img_name+img_size)
         else:
             print("\n\nHappy New Year!")  # 해피뉴이어!
-            raw_content.update(content)
 
-            with open(os.path.join(path_result, 'gray_via_region_data.json'), 'w', encoding='utf-8') as f:
-                json.dump(raw_content, f)
+            with open(os.path.join(path_result, f'gray_{content_name}'), 'w', encoding='utf-8') as f:
+                json.dump(content, f)
 
         print(f'Grayscale된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
