@@ -113,7 +113,7 @@ class ImgAugment:
             raw_content.update(content)
 
             # 합본 json파일을 저장합니다.
-            with open(os.path.join(path_result, f'flip_{content_name}'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(path_result, f'{content_name}'), 'w', encoding='utf-8') as f:
                 json.dump(raw_content, f)
 
         print(f'Flip된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
@@ -166,7 +166,7 @@ class ImgAugment:
         else:
             print("\n\nHappy New Year!")  # 해피뉴이어!
 
-            with open(os.path.join(path_result, f'gray_{content_name}'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(path_result, f'{content_name}'), 'w', encoding='utf-8') as f:
                 json.dump(content, f)
 
         print(f'Grayscale된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
