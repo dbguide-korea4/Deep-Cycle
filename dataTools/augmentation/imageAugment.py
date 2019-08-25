@@ -82,8 +82,8 @@ class ImgAugment:
                     imwrite(os.path.join(
                         path_result, img_name_flip), image_flip)
 
-                    img_size_flip = os.path.getsize(os.path.join(
-                        path_result, img_name_flip))  # Flip된 이미지 파일 용량
+                    img_size_flip = str(os.path.getsize(os.path.join(
+                        path_result, img_name_flip)))  # Flip된 이미지 파일 용량
 
                 self.progress_bar(n, len(self.img_files), time.time()-tic)
                 ################# content_flip의 x, y좌표를 바꿔줍니다. #################
@@ -138,8 +138,8 @@ class ImgAugment:
 
             img_name_gray = f"gray_{img_name.split('.')[0]}.png"
             img.save(os.path.join(path_result, img_name_gray))
-            img_size_gray = os.path.getsize(os.path.join(
-                path_result, img_name_gray))
+            img_size_gray = str(os.path.getsize(os.path.join(
+                path_result, img_name_gray)))
 
             self.progress_bar(n, len(self.img_files), time.time()-tic)
             ################# content_flip의 size, filename, key를 바꿔줍니다. #################
