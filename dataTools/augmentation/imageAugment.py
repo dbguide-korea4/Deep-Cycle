@@ -41,7 +41,7 @@ class ImgAugment:
         files = os.listdir(self.path_imgs)
         img_files = [_ for _ in files if _.split(
             ".")[-1].lower() in self.img_type]
-        content_name = [_ for _ in files if _.split('.')[-1] in 'json'][0]
+        content_name = [_ for _ in files if _.split('.')[-1] == 'json'][0]
         with open(os.path.join(self.path_imgs, content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
 
@@ -81,7 +81,7 @@ class ImgAugment:
                 # Annotation 개수에 상관없이 1번만 실행되는 구문입니다.
                 if i == 0:
                     imwrite(os.path.join(
-                        path_result, f'flip_{img_name}'), image_flip[:, :, :3])
+                        path_result, f"flip_{img_name.split('.')[0]}.jpeg"), image_flip[:, :, :3])
 
                     img_size_flip = os.path.getsize(os.path.join(
                         path_result, f'flip_{img_name}'))  # Flip된 이미지 파일 용량
@@ -116,7 +116,7 @@ class ImgAugment:
             with open(os.path.join(path_result, f'{content_name}'), 'w', encoding='utf-8') as f:
                 json.dump(raw_content, f)
 
-        print(f'Flip된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
+        print(f"Flip된 이미지: {len(img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='jpg'])} 개")
 
     def gray_scale(self, path_result=None):
         from imgaug.augmenters import Grayscale
@@ -131,7 +131,7 @@ class ImgAugment:
         files = os.listdir(self.path_imgs)
         img_files = [_ for _ in files if _.split(
             ".")[-1].lower() in self.img_type]
-        content_name = [_ for _ in files if _.split('.')[-1] in 'json'][0]
+        content_name = [_ for _ in files if _.split('.')[-1] == 'json'][0]
         with open(os.path.join(self.path_imgs, content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
 
@@ -151,7 +151,7 @@ class ImgAugment:
             img_aug = aug(image=img)
 
             imwrite(os.path.join(path_result,
-                                 f'gray_{img_name}'), img_aug[:, :, :3])
+                                 f"gray_{img_name.split('.')[0]}.jpeg"), img_aug[:, :, :3])
             img_size_gray = os.path.getsize(os.path.join(
                 path_result, f'gray_{img_name}'))  # Flip된 이미지 파일 용량
 
@@ -169,4 +169,4 @@ class ImgAugment:
             with open(os.path.join(path_result, f'{content_name}'), 'w', encoding='utf-8') as f:
                 json.dump(content, f)
 
-        print(f'Grayscale된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
+        print(f"Grayscale된 이미지: {len(img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='jpg'])} 개")
