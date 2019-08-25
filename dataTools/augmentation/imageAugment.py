@@ -1,10 +1,8 @@
 import os
-import copy
 import json
 import time
 import numpy as np
 from PIL import Image
-from imageio import imwrite
 
 
 class ImgAugment:
@@ -32,6 +30,8 @@ class ImgAugment:
         sys.stdout.flush()
 
     def flip(self, path_result=None):
+        import copy
+        from matplotlib.pyplot import imsave
         from imgaug.augmenters import Fliplr
         from imgaug.augmentables.polys import Polygon, PolygonsOnImage
 
@@ -79,7 +79,7 @@ class ImgAugment:
 
                 # Annotation 개수에 상관없이 1번만 실행되는 구문입니다.
                 if i == 0:
-                    imwrite(os.path.join(
+                    imsave(os.path.join(
                         path_result, img_name_flip), image_flip)
 
                     img_size_flip = str(os.path.getsize(os.path.join(
