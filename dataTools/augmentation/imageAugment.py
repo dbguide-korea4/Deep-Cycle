@@ -11,8 +11,13 @@ class ImgAugment:
     def __init__(self, path_imgs=None, **kwargs):
         self.path_imgs = os.path.abspath(
             './imgs') if path_imgs is None else path_imgs
+
         # 이미지(jpg, png, jpeg, gif)만 보기
-        self.img_type = ['jpg', 'png', 'jpeg']
+        img_type = ['jpg', 'png', 'jpeg']
+        files = os.listdir(self.path_imgs)
+        self.img_files = [_ for _ in files if _.split(
+            ".")[-1].lower() in img_type]
+        self.content_name = [_ for _ in files if _.split('.')[-1] == 'json'][0]
 
     @staticmethod
     def progress_bar(value, endvalue, stamp, bar_length=50):
@@ -34,31 +39,26 @@ class ImgAugment:
 
         path_result = os.path.join(
             self.path_imgs, '../flip_images') if path_result is None else path_result
-
         if not os.path.isdir(path_result):
             os.makedirs(path_result)
 
-        files = os.listdir(self.path_imgs)
-        img_files = [_ for _ in files if _.split(
-            ".")[-1].lower() in self.img_type]
-        with open(os.path.join(self.path_imgs, [_ for _ in files if _.split('.')[-1] in 'json'][0]), "r", encoding='utf-8') as f:
+        with open(os.path.join(self.path_imgs, self.content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
-
-        print(
-            f'total: {len(img_files)}  content: {len(content)}\n')
+            print(f'total: {len(self.img_files)}  content: {len(content)}\n')
 
         aug = Fliplr(1.0)  # 100% Flip시켜주는 인스턴스
         # Flip된 이미지의 json파일을 만들어주기 위해 기존 content를 복사합니다.
         raw_content = copy.deepcopy(content)
 
         # 이미지 개수만큼 반복
-        for n, img_name in enumerate(img_files, 1):
+        for n, img_name in enumerate(self.img_files, 1):
             raw_img = Image.open(os.path.join(self.path_imgs, img_name))
-            img = np.array(raw_img.convert('RGB'))  # 이미지
+            img = np.array(raw_img.convert('RGBA'))  # 이미지
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
-            # Annotation 개수
+            img_name_flip = f"flip_{img_name.split('.')[0]}.png"
 
+            # Annotation 개수
             annotation = len(content[img_name+img_size]['regions'])
 
             # Annotation 개수만큼 반복
@@ -80,12 +80,12 @@ class ImgAugment:
                 # Annotation 개수에 상관없이 1번만 실행되는 구문입니다.
                 if i == 0:
                     imwrite(os.path.join(
-                        path_result, f'flip_{img_name}'), image_flip[:, :, :3])
+                        path_result, img_name_flip), image_flip)
 
-                    img_size_flip = os.path.getsize(os.path.join(
-                        path_result, f'flip_{img_name}'))  # Flip된 이미지 파일 용량
+                    img_size_flip = str(os.path.getsize(os.path.join(
+                        path_result, img_name_flip)))  # Flip된 이미지 파일 용량
 
-                self.progress_bar(n, len(img_files), time.time()-tic)
+                self.progress_bar(n, len(self.img_files), time.time()-tic)
                 ################# content_flip의 x, y좌표를 바꿔줍니다. #################
                 # Flip된 point의 x좌표모음을 Polygon type에서 list type으로 바꿔줍니다.
                 x_flip = point_flip.polygons[0].xx_int.tolist()
@@ -100,9 +100,9 @@ class ImgAugment:
                 # size를 바꿔줍니다.
                 content[img_name+img_size]['size'] = img_size_flip
                 # filename을 바꿔줍니다.
-                content[img_name+img_size]['filename'] = f'flip_{img_name}'
+                content[img_name+img_size]['filename'] = img_name_flip
                 # key를 바꿔줍니다.
-                content[f'flip_{img_name}{img_size_flip}'] = content.pop(
+                content[img_name_flip+img_size_flip] = content.pop(
                     img_name+img_size)
 
         # 모든 이미지, Annotation이 Flip되어 저장되었고, Flip된 이미지를 반영하는 json파일(content_flip)이 완성되었습니다.
@@ -112,61 +112,48 @@ class ImgAugment:
             raw_content.update(content)
 
             # 합본 json파일을 저장합니다.
-            with open(os.path.join(path_result, 'flip_via_region_data.json'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(path_result, self.content_name), 'w', encoding='utf-8') as f:
                 json.dump(raw_content, f)
-
-        print(f'Flip된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
+                print(
+                    f"Flip된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='png'])} 개")
 
     def gray_scale(self, path_result=None):
-        from imgaug.augmenters import Grayscale
         tic = time.time()
 
         path_result = os.path.join(
             self.path_imgs, '../gray_images') if path_result is None else path_result
-
         if not os.path.isdir(path_result):
             os.makedirs(path_result)
 
-        files = os.listdir(self.path_imgs)
-        img_files = [_ for _ in files if _.split(
-            ".")[-1].lower() in self.img_type]
-        with open(os.path.join(self.path_imgs, [_ for _ in files if _.split('.')[-1] in 'json'][0]), "r", encoding='utf-8') as f:
+        with open(os.path.join(self.path_imgs, self.content_name), "r", encoding='utf-8') as f:
             content = json.load(f)
-
-        print(
-            f'total: {len(img_files)}  content: {len(content)}\n')
-
-        aug = Grayscale(alpha=1)  # 그레이스케일
-        # 그레이스케일된 이미지의 json파일을 만들어주기 위해 기존 content를 복사합니다.
-        raw_content = copy.deepcopy(content)
+            print(f'total: {len(self.img_files)}  content: {len(content)}\n')
 
         # 이미지 개수만큼 반복
-        for n, img_name in enumerate(img_files, 1):
+        for n, img_name in enumerate(self.img_files, 1):
             raw_img = Image.open(os.path.join(self.path_imgs, img_name))
-            img = np.array(raw_img.convert('RGB'))
+            img = raw_img.convert('LA')
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
 
-            img_aug = aug(image=img)
+            img_name_gray = f"gray_{img_name.split('.')[0]}.png"
+            img.save(os.path.join(path_result, img_name_gray))
+            img_size_gray = str(os.path.getsize(os.path.join(
+                path_result, img_name_gray)))
 
-            imwrite(os.path.join(path_result,
-                                 f'gray_{img_name}'), img_aug[:, :, :3])
-            img_size_gray = os.path.getsize(os.path.join(
-                path_result, f'gray_{img_name}'))  # Flip된 이미지 파일 용량
-
-            self.progress_bar(n, len(img_files), time.time()-tic)
+            self.progress_bar(n, len(self.img_files), time.time()-tic)
             ################# content_flip의 size, filename, key를 바꿔줍니다. #################
             content[img_name+img_size]['size'] = img_size_gray  # size를 바꿔줍니다.
             # filename을 바꿔줍니다.
-            content[img_name+img_size]['filename'] = f'gray_{img_name}'
+            content[img_name +
+                    img_size]['filename'] = img_name_gray
             # key를 바꿔줍니다.
-            content[f'gray_{img_name}{img_size_gray}'] = content.pop(
+            content[img_name_gray+img_size_gray] = content.pop(
                 img_name+img_size)
         else:
             print("\n\nHappy New Year!")  # 해피뉴이어!
-            raw_content.update(content)
 
-            with open(os.path.join(path_result, 'gray_via_region_data.json'), 'w', encoding='utf-8') as f:
-                json.dump(raw_content, f)
-
-        print(f'Grayscale된 이미지: {len(img_files)} 중 {len(os.listdir(path_result))-1} 개')
+            with open(os.path.join(path_result, self.content_name), 'w', encoding='utf-8') as f:
+                json.dump(content, f)
+                print(
+                    f"Grayscale된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='png'])} 개")
