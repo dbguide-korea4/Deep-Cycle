@@ -1,10 +1,10 @@
-def url_to_array(url):
+def src_to_array(src):
     import requests
-    from matplotlib.pyplot import imread
     from io import BytesIO
+    from matplotlib.pyplot import imread
 
-    resp = requests.get(url)
-    arr = imread(BytesIO(resp.content), format=resp.headers['Content-Type'].split('/')[1])
+    resp = requests.get(src)
+    arr = imread(BytesIO(resp.content), format=resp.headers['Content-Type'].split('/')[-1])
     
     return arr
 

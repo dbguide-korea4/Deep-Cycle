@@ -50,54 +50,45 @@ class SearchImgSE:
             driver.close()
 
     @staticmethod
-    def imgs_save(url, filename, path):
+    def imgs_save(url, filename, path, conv=False):
         import requests
         import os
+        from io import BytesIO
+        from PIL import Image
 
         resp = requests.get(url)
-        con_type = resp.headers['Content-Type'].split('/')[1].split(';')[0]
 
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        if con_type.lower() in ['jpg', 'jpeg', 'png']:
-            with open(f'{path}{filename}.{con_type}', 'wb') as fp:
-                fp.write(resp.content)
-
-            print(f'success: {filename}.{con_type}')
+        if conv is True:
+            con_type = 'png'
+            img = Image.open(BytesIO(resp.content)).convert('RGBA')
+            img.save(f'{path}{filename}.{con_type}')
         else:
-            raise
-
-    @staticmethod
-    def src_to_array(src):
-        import requests
-        from matplotlib.pylab import imread
-        from io import BytesIO
-
-        resp = requests.get(src)
-        arr = imread(BytesIO(resp.content),
-                     format=resp.headers['Content-Type'].split('/')[1])
-
-        return arr
+            con_type = resp.headers['Content-Type'].split('/')[1].split(';')[0]
+            if con_type in ['jpeg', 'png']:
+                with open(f'{path}{filename}.{con_type}', 'wb') as fp:
+                    fp.write(resp.content)
+            else:
+                raise
+        print(f'success: {filename}.{con_type}')
 
     def naver_imgs_se(self, n_round=10, down=True):
         import time
-        from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
         tic = time.time()
         url = f'https://search.naver.com/search.naver?where=image&query={self.query}'
+
         driver = self.sel_driver(url)
         driver.find_element_by_css_selector(
             'div.photo_grid div.img_area').click()
-
         print('Collecting images...')
 
         img_src = []
-        imgs_arr = []
-        n_except = 0
         for n in range(n_round):
             try:
                 dom = BeautifulSoup(driver.page_source, 'lxml')
@@ -118,12 +109,14 @@ class SearchImgSE:
                 print('\nStop collecting!')
                 break
 
-        img_src = set(img_src)
         self.closed_sel_windows(driver)
-        print(f'\n\nDownloading {len(img_src)} images...')
+        img_src = set(img_src)
 
-        for i, src in enumerate(img_src):
-            if down is True:
+        if down is True:
+            print(f'\n\nDownloading {len(img_src)} images...')
+
+            total = 0
+            for i, src in enumerate(img_src):
                 try:
                     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                     img_name = f'img{timestamp}_{self.query}{i}'
@@ -134,35 +127,31 @@ class SearchImgSE:
                     break
                 except:
                     print(f'failed: img{i}')
-                    n_except += 1
+                    total -= 1
                     pass
-            else:
-                imgs_arr.append(self.src_to_array(src))
+                else:
+                    total += 1
 
-        total = len(img_src) - n_except
-        print(f'\n{total if total>0 else 0} files safely done')
-
-        if down is False:
-            return array(imgs_arr)
+            print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
+        else:
+            print(f'\n\nTotal: {len(img_src)} images')
+            return img_src
 
     def daum_imgs_se(self, n_round=10, down=True):
         import time
-        from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
         tic = time.time()
         url = f'https://search.daum.net/search?w=img&enc=utf8&q={self.query}'
+
         driver = self.sel_driver(url)
         driver.find_element_by_css_selector(
             'div.cont_img div.wrap_thumb').click()
-
         print('Collecting images...')
 
         img_src = []
-        imgs_arr = []
-        n_except = 0
         for n in range(n_round):
             try:
                 dom = BeautifulSoup(driver.page_source, 'lxml')
@@ -184,12 +173,14 @@ class SearchImgSE:
                 print('\nStop collecting!')
                 break
 
-        img_src = set(img_src)
         self.closed_sel_windows(driver)
-        print(f'\n\nDownloading {len(img_src)} images...')
+        img_src = set(img_src)
 
-        for i, src in enumerate(img_src):
-            if down is True:
+        if down is True:
+            print(f'\n\nDownloading {len(img_src)} images...')
+
+            total = 0
+            for i, src in enumerate(img_src):
                 try:
                     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                     img_name = f'img{timestamp}_{self.query}{i}'
@@ -200,35 +191,30 @@ class SearchImgSE:
                     break
                 except:
                     print(f'failed: img{i}')
-                    n_except += 1
+                    total -= 1
                     pass
-            else:
-                imgs_arr.append(self.src_to_array(src))
+                else:
+                    total += 1
 
-        total = len(img_src) - n_except
-        print(f'\n{total if total>0 else 0} files safely done')
-
-        if down is False:
-            return array(imgs_arr)
+            print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
+        else:
+            print(f'\n\nTotal: {len(img_src)} images')
+            return img_src
 
     def google_imgs_se(self, down=True):
         import time
         import json
-        from numpy import array
         from datetime import datetime
         from bs4 import BeautifulSoup
         from selenium.common.exceptions import NoSuchElementException
 
         tic = time.time()
         url = f'https://www.google.com/search?q={self.query}&tbm=isch'
-        driver = self.sel_driver(url)
 
+        driver = self.sel_driver(url)
         print('Collecting images...')
 
         imgs_arr = []
-        n_except = 0
-        stamp = 0
-
         last_height = driver.execute_script(
             'return document.body.scrollHeight')
         while True:
@@ -247,17 +233,19 @@ class SearchImgSE:
                     break
             last_height = new_height
 
-        print('Time: ', time.strftime('%M:%S', time.gmtime(stamp)))
-
         dom = BeautifulSoup(driver.page_source, 'lxml')
         img_src = {json.loads(_.text)['ou'] for _ in dom.find_all(
             'div', {'class': 'rg_meta'})}
 
-        self.closed_sel_windows(driver)
-        print(f'Downloading {len(img_src)} images...')
+        print('Time: ', time.strftime('%M:%S', time.gmtime(stamp)))
 
-        for i, src in enumerate(img_src):
-            if down is True:
+        self.closed_sel_windows(driver)
+
+        if down is True:
+            print(f'\n\nDownloading {len(img_src)} images...')
+
+            total = 0
+            for i, src in enumerate(img_src):
                 try:
                     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                     img_name = f'img{timestamp}_{self.query}{i}'
@@ -268,13 +256,12 @@ class SearchImgSE:
                     break
                 except:
                     print(f'failed: img{i}')
-                    n_except += 1
+                    total -= 1
                     pass
-            else:
-                imgs_arr.append(self.src_to_array(src))
+                else:
+                    total += 1
 
-        total = len(img_src) - n_except
-        print(f'\n{total if total>0 else 0} files safely done')
-
-        if down is False:
-            return array(imgs_arr)
+            print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
+        else:
+            print(f'\n\nTotal: {len(img_src)} images')
+            return img_src
