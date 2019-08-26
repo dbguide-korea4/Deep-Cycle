@@ -53,10 +53,10 @@ class ImgAugment:
         # 이미지 개수만큼 반복
         for n, img_name in enumerate(self.img_files, 1):
             raw_img = Image.open(os.path.join(self.path_imgs, img_name))
-            img = np.array(raw_img.convert('RGBA'))  # 이미지
+            img = np.array(raw_img.convert('RGB'))  # 이미지
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
-            img_name_flip = f"flip_{img_name.split('.')[0]}.png"
+            img_name_flip = f"flip_{img_name.split('.')[0]}.jpeg"
 
             # Annotation 개수
             annotation = len(content[img_name+img_size]['regions'])
@@ -115,7 +115,7 @@ class ImgAugment:
             with open(os.path.join(path_result, self.content_name), 'w', encoding='utf-8') as f:
                 json.dump(raw_content, f)
                 print(
-                    f"Flip된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='png'])} 개")
+                    f"Flip된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='jpeg'])} 개")
 
     def gray_scale(self, path_result=None):
         tic = time.time()
@@ -132,11 +132,11 @@ class ImgAugment:
         # 이미지 개수만큼 반복
         for n, img_name in enumerate(self.img_files, 1):
             raw_img = Image.open(os.path.join(self.path_imgs, img_name))
-            img = raw_img.convert('LA')
+            img = raw_img.convert('L')
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
 
-            img_name_gray = f"gray_{img_name.split('.')[0]}.png"
+            img_name_gray = f"gray_{img_name.split('.')[0]}.jpeg"
             img.save(os.path.join(path_result, img_name_gray))
             img_size_gray = str(os.path.getsize(os.path.join(
                 path_result, img_name_gray)))
@@ -156,4 +156,4 @@ class ImgAugment:
             with open(os.path.join(path_result, self.content_name), 'w', encoding='utf-8') as f:
                 json.dump(content, f)
                 print(
-                    f"Grayscale된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='png'])} 개")
+                    f"Grayscale된 이미지: {len(self.img_files)} 중 {len([_ for _ in os.listdir(path_result) if _.split('.')[-1] =='jpeg'])} 개")

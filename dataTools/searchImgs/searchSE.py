@@ -50,7 +50,7 @@ class SearchImgSE:
             driver.close()
 
     @staticmethod
-    def imgs_save(url, filename, path, conv=False):
+    def imgs_save(url, filename, path, conv=True):
         import requests
         import os
         from io import BytesIO
@@ -62,16 +62,14 @@ class SearchImgSE:
             os.makedirs(path)
 
         if conv is True:
-            con_type = 'png'
-            img = Image.open(BytesIO(resp.content)).convert('RGBA')
+            con_type = 'jpeg'
+            img = Image.open(BytesIO(resp.content)).convert('RGB')
             img.save(f'{path}{filename}.{con_type}')
         else:
             con_type = resp.headers['Content-Type'].split('/')[1].split(';')[0]
-            if con_type in ['jpeg', 'png']:
-                with open(f'{path}{filename}.{con_type}', 'wb') as fp:
-                    fp.write(resp.content)
-            else:
-                raise
+            with open(f'{path}{filename}.{con_type}', 'wb') as fp:
+                fp.write(resp.content)
+
         print(f'success: {filename}.{con_type}')
 
     def naver_imgs_se(self, n_round=10, down=True):
@@ -135,7 +133,7 @@ class SearchImgSE:
             print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
         else:
             print(f'\n\nTotal: {len(img_src)} images')
-            return img_src
+            return list(img_src)
 
     def daum_imgs_se(self, n_round=10, down=True):
         import time
@@ -199,7 +197,7 @@ class SearchImgSE:
             print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
         else:
             print(f'\n\nTotal: {len(img_src)} images')
-            return img_src
+            return list(img_src)
 
     def google_imgs_se(self, down=True):
         import time
@@ -242,7 +240,7 @@ class SearchImgSE:
         self.closed_sel_windows(driver)
 
         if down is True:
-            print(f'\n\nDownloading {len(img_src)} images...')
+            print(f'\nDownloading {len(img_src)} images...')
 
             total = 0
             for i, src in enumerate(img_src):
@@ -264,4 +262,4 @@ class SearchImgSE:
             print(f'\n{total if total>0 else 0}/{len(img_src)} files safely done')
         else:
             print(f'\n\nTotal: {len(img_src)} images')
-            return img_src
+            return list(img_src)
