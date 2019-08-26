@@ -76,7 +76,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
-                      colors=None, captions=None, save=False):
+                      colors=None, captions=None, save=False, stamp=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -158,9 +158,12 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if save:
-        plt.savefig('images/result.jpeg')
-    # if auto_show:
-    #     plt.show()
+        auto_show = False
+        image_path = f'images/result{stamp}.jpeg'
+        plt.savefig(image_path)
+        return image_path
+    if auto_show:
+        plt.show()
 
 
 def display_differences(image,

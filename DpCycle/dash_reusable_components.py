@@ -28,34 +28,23 @@ config.display()
 
 class LoadModel():
     def __init__(self, **kwargs):
-        # Import Mask RCNN
-        from utils.mrcnn.model import MaskRCNN
         # Root directory of the project
         ROOT_DIR = os.path.abspath("./")
 
         # Directory to save logs and trained model
-        MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
+        self.MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
 
         # Local path to trained weights file
-        COCO_MODEL_PATH = os.path.join(
+        self.COCO_MODEL_PATH = os.path.join(
             ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
-            
-        """## Create Model and Load Trained Weights"""
 
-        # Create model object in inference mode.
-        self.model = MaskRCNN(
-            mode="inference", model_dir=MODEL_DIR, config=config)
-
-        # Load weights trained on MS-COCO
-        self.model.load_weights(COCO_MODEL_PATH, by_name=True)
-
-        # Define classes
-        self.class_names = ['BG', 'glass_bottle', 'pet', 'can']
 
     def result_visualize(self, pil, IMAGE_DIR=None):
         import numpy as np
         from PIL import Image
 
+        # Import Mask RCNN
+        from utils.mrcnn.model import MaskRCNN
         from utils.mrcnn import visualize
 
         """## Run Object Detection"""
@@ -72,20 +61,29 @@ class LoadModel():
         #     print(file_name)
         #     pil = Image.open(file_name).convert('RGB')
 
-        image = np.array(pil.convert('RGB'))
+        """## Create Model and Load Trained Weights"""
+
+        # Create model object in inference mode.
+        model = MaskRCNN(
+            mode="inference", model_dir=self.MODEL_DIR, config=config)
+
+        # Load weights trained on MS-COCO
+        model.load_weights(self.COCO_MODEL_PATH, by_name=True)
+
+        # Define classes
+        class_names = ['BG', 'glass_bottle', 'pet', 'can']
+
+        image = np.array(pil)
         # Run detection
-        results = self.model.detect([image], verbose=1)
+        results = model.detect([image], verbose=1)
 
         # Visualize results
         r = results[0]
         print(r['class_ids'])
-        visualize.display_instances(
-            image, r['rois'], r['masks'], r['class_ids'], self.class_names, r['scores'], save=True)
+        image_name = visualize.display_instances(
+            image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'], save=True, stamp=timestamp())
 
-        file_list = [f'{path}/{file}' for path, _,
-                     files in os.walk('./images') for file in files if 'result' in file]
-        file_name = file_list[-1]
-        r_pil = Image.open(file_name)
+        r_pil = Image.open(image_name)
         return r_pil
 
 # Display utility functions
