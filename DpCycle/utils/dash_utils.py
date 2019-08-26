@@ -2,8 +2,8 @@ import os
 import pathlib
 import json
 
-import dash_core_components as dcc
 import plotly.graph_objs as go
+import dash_core_components as dcc
 import dash_reusable_components as drc
 
 from PIL import Image, ImageFilter, ImageDraw, ImageEnhance
@@ -19,7 +19,7 @@ STORAGE_PLACEHOLDER = json.dumps(
 )
 
 IMAGE_STRING_PLACEHOLDER = drc.pil_to_b64(
-    Image.open(os.path.join(APP_PATH, os.path.join("images", "default.jpeg"))).copy(),
+    Image.open(os.path.join(APP_PATH, os.path.join("../images", "default.jpeg"))).copy(),
     enc_format="jpeg",
 )
 
@@ -65,27 +65,6 @@ GRAPH_PLACEHOLDER = dcc.Graph(
     },
 )
 
-# Maps process name to the Image filter corresponding to that process
-FILTERS_DICT = {
-    "blur": ImageFilter.BLUR,
-    "contour": ImageFilter.CONTOUR,
-    "detail": ImageFilter.DETAIL,
-    "edge_enhance": ImageFilter.EDGE_ENHANCE,
-    "edge_enhance_more": ImageFilter.EDGE_ENHANCE_MORE,
-    "emboss": ImageFilter.EMBOSS,
-    "find_edges": ImageFilter.FIND_EDGES,
-    "sharpen": ImageFilter.SHARPEN,
-    "smooth": ImageFilter.SMOOTH,
-    "smooth_more": ImageFilter.SMOOTH_MORE,
-}
-
-ENHANCEMENT_DICT = {
-    "color": ImageEnhance.Color,
-    "contrast": ImageEnhance.Contrast,
-    "brightness": ImageEnhance.Brightness,
-    "sharpness": ImageEnhance.Sharpness,
-}
-
 
 def generate_lasso_mask(image, selectedData):
     """
@@ -105,29 +84,3 @@ def generate_lasso_mask(image, selectedData):
 
     return mask
 
-
-def apply_filters(image, zone, filter, mode):
-    filter_selected = FILTERS_DICT[filter]
-
-    if mode == "select":
-        crop = image.crop(zone)
-        crop_mod = crop.filter(filter_selected)
-        image.paste(crop_mod, zone)
-
-    elif mode == "lasso":
-        im_filtered = image.filter(filter_selected)
-        image.paste(im_filtered, mask=zone)
-
-
-def apply_enhancements(image, zone, enhancement, enhancement_factor, mode):
-    enhancement_selected = ENHANCEMENT_DICT[enhancement]
-    enhancer = enhancement_selected(image)
-
-    im_enhanced = enhancer.enhance(enhancement_factor)
-
-    if mode == "select":
-        crop = im_enhanced.crop(zone)
-        image.paste(crop, box=zone)
-
-    elif mode == "lasso":
-        image.paste(im_enhanced, mask=zone)

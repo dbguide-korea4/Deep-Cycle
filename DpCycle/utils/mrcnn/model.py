@@ -19,12 +19,12 @@ import numpy as np
 import skimage.transform
 import tensorflow as tf
 import keras
-import keras.backend as K
-import keras.layers as KL
-import keras.engine as KE
-import keras.models as KM
+from keras import backend as K
+from keras import layers as KL
+from keras import engine as KE
+from keras import models as KM
 
-from Mask_RCNN.mrcnn import utils
+from utils.mrcnn import mrcnn_utils as utils
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -352,7 +352,7 @@ class ProposalLayer(KE.Layer):
 
 def log2_graph(x):
     """Implementation of Log2. TF doesn't have a native implementation."""
-    return tf.log(x) / tf.log(2.0)
+    return tf.math.log(x) / tf.math.log(2.0)
 
 
 class PyramidROIAlign(KE.Layer):
@@ -2094,7 +2094,7 @@ class MaskRCNN():
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
-            from Mask_RCNN.mrcnn.parallel_model import ParallelModel
+            from utils.mrcnn.parallel_model import ParallelModel
             model = ParallelModel(model, config.GPU_COUNT)
 
         return model

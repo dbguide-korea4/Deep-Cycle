@@ -17,7 +17,7 @@ from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
-from Mask_RCNN.mrcnn import utils
+from utils.mrcnn import mrcnn_utils as utils
 
 
 ############################################################
@@ -158,9 +158,9 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if save:
-        plt.savefig('./images/result.png')
-    if auto_show:
-        plt.show()
+        plt.savefig('images/result.png')
+    # if auto_show:
+    #     plt.show()
 
 
 def display_differences(image,

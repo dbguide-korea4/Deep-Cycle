@@ -11,9 +11,82 @@ import dash_html_components as html
 
 import plotly.graph_objs as go
 
+from utils import temp
+
 # Variables
 HTML_IMG_SRC_PARAMETERS = "data:image/png;base64, "
 
+class InferenceConfig(temp.BalloonConfig):
+    # Set batch size to 1 since we'll be running inference on
+    # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+
+
+class LoadModel():
+    def __init__(self, **kwargs):
+        # Root directory of the project
+        ROOT_DIR = os.path.abspath("./")
+
+        # Directory to save logs and trained model
+        self.MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
+
+        # Local path to trained weights file
+        self.COCO_MODEL_PATH = os.path.join(
+            ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
+
+    def result_visualize(self, pil, IMAGE_DIR=None):
+        import numpy as np
+        from PIL import Image
+
+        # Import Mask RCNN
+        import utils.mrcnn.model as modellib
+        from utils.mrcnn import visualize
+
+        config = InferenceConfig()
+        config.display()
+
+        """## Create Model and Load Trained Weights"""
+
+        # Create model object in inference mode.
+        model = modellib.MaskRCNN(
+            mode="inference", model_dir=self.MODEL_DIR, config=config)
+
+        # Load weights trained on MS-COCO
+        model.load_weights(self.COCO_MODEL_PATH, by_name=True)
+
+        # Define classes
+        class_names = ['BG', 'glass_bottle', 'pet', 'can']
+
+        """## Run Object Detection"""
+
+        # Load a random image from the images folder
+        # file_names = next(os.walk(IMAGE_DIR))[2]
+
+        if pil is not None:
+            pil = pil.convert('RGB')
+        else:
+            file_list = [f'{path}/{file}' for path, _,
+                         files in os.walk('./images') for file in files if 'upload' in file]
+            file_name = file_list[-1]
+            print(file_name)
+            pil = Image.open(file_name).convert('RGB')
+
+        image = np.array(pil)
+        # Run detection
+        results = model.detect([image], verbose=1)
+
+        # Visualize results
+        r = results[0]
+        print(r['class_ids'])
+        visualize.display_instances(
+            image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'], save=True)
+
+        file_list = [f'{path}/{file}' for path, _,
+                     files in os.walk('./images') for file in files if 'result' in file]
+        file_name = file_list[-1]
+        r_pil = Image.open(file_name)
+        return r_pil
 
 # Display utility functions
 def _merge(a, b):
@@ -41,7 +114,7 @@ def pil_to_b64(im, enc_format="png", verbose=False, **kwargs):
 
     buff = _BytesIO()
     im.save(buff, format=enc_format, **kwargs)
-    im.save(f'./images/upload{timestamp()}.{enc_format}', enc_format)
+    im.convert('RGB').save(f'images/upload{timestamp()}.jpeg', enc_format)
 
     encoded = base64.b64encode(buff.getvalue()).decode("utf-8")
 
@@ -194,31 +267,6 @@ def NamedSlider(name, id, min, max, step, value, marks=None):
     )
 
 
-def NamedInlineRadioItems(name, short, options, val, **kwargs):
-    return html.Div(
-        id=f"div-{short}",
-        style=_merge(
-            {"display": "block", "margin-bottom": "5px", "margin-top": "5px"},
-            kwargs.get("style", {}),
-        ),
-        children=[
-            f"{name}:",
-            dcc.RadioItems(
-                id=f"radio-{short}",
-                options=options,
-                value=val,
-                labelStyle={
-                    "display": "inline-block",
-                    "margin-right": "7px",
-                    "font-weight": 300,
-                },
-                style={"display": "inline-block", "margin-left": "7px"},
-            ),
-        ],
-        **_omit(["style"], kwargs),
-    )
-
-
 # Custom Image Components
 def InteractiveImagePIL(
     image_id, image, enc_format="png", dragmode="select", verbose=False, **kwargs
@@ -299,8 +347,3 @@ def DisplayImagePIL(id, image, **kwargs):
         **kwargs,
     )
 
-
-def CustomDropdown(**kwargs):
-    return html.Div(
-        dcc.Dropdown(**kwargs), style={"margin-top": "5px", "margin-bottom": "5px"}
-    )

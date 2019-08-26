@@ -34,17 +34,17 @@ import datetime
 import numpy as np
 import skimage.draw
 
-from Mask_RCNN.mrcnn.config import Config
-from Mask_RCNN.mrcnn import model as modellib, utils
+from utils.mrcnn.config import Config
+from utils.mrcnn import model as modellib, mrcnn_utils
 
 ROOT_DIR = os.path.abspath("./")
 
 # Path to trained weights file
-COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "utils/logs/mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "utils/logs")
 
 ############################################################
 #  Configurations
@@ -76,7 +76,7 @@ class BalloonConfig(Config):
 #  Dataset
 ############################################################
 
-class BalloonDataset(utils.Dataset):
+class BalloonDataset(mrcnn_utils.Dataset):
 
     def load_balloon(self, dataset_dir, subset):
         """Load a subset of the Balloon dataset.
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
-                        help='Logs and checkpoints directory (default=logs/)')
+                        help='Logs and checkpoints directory (default=utils/logs/)')
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the color splash effect on')
@@ -344,7 +344,7 @@ if __name__ == '__main__':
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
         if not os.path.exists(weights_path):
-            utils.download_trained_weights(weights_path)
+            mrcnn_utils.download_trained_weights(weights_path)
     elif args.weights.lower() == "last":
         # Find last trained weights
         weights_path = model.find_last()[1]
