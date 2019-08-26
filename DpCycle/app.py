@@ -109,11 +109,12 @@ def store_image_string(string_image, key_name):
         print(key_name)
     # If local, the string is stored in image_string.csv
     if LOCAL:
-        with open("image_string.csv", mode="w+") as image_file:
-            image_writer = csv.DictWriter(
-                image_file, fieldnames=["key", "image"])
-            image_writer.writeheader()
-            image_writer.writerow(dict(key=key_name, image=string_image))
+        # with open("image_string.csv", mode="w+") as image_file:
+        #     image_writer = csv.DictWriter(
+        #         image_file, fieldnames=["key", "image"])
+        #     image_writer.writeheader()
+        #     image_writer.writerow(dict(key=key_name, image=string_image))
+        pass
     # Generate the POST attributes
     else:
         post = s3.generate_presigned_post(Bucket=bucket_name, Key=key_name)
@@ -223,76 +224,6 @@ def serve_layout():
 
 app.layout = serve_layout
 
-
-# Helper functions for callbacks
-def add_action_to_stack(action_stack, operation, operation_type, selectedData):
-    """
-    Add new action to the action stack, in-place.
-    :param action_stack: The stack of action that are applied to an image
-    :param operation: The operation that is applied to the image
-    :param operation_type: The type of the operation, which could be a filter,
-    an enhancement, etc.
-    :param selectedData: The JSON object that contains the zone selected by
-    the user in which the operation is applied
-    :return: None, appending is done in place
-    """
-
-    new_action = {
-        "operation": operation,
-        "type": operation_type,
-        "selectedData": selectedData,
-    }
-
-    action_stack.append(new_action)
-
-
-# Recursively retrieve the previous versions of the image by popping the
-# action stack
-@cache.memoize()
-def apply_actions_on_image(session_id, action_stack, filename, image_signature):
-    action_stack = deepcopy(action_stack)
-
-    # If we have arrived to the original image
-    if len(action_stack) == 0 and LOCAL:
-        with open("image_string.csv", mode="r") as image_file:
-            image_reader = csv.DictReader(image_file)
-            for row in image_reader:
-                im_pil = drc.b64_to_pil(row["image"])
-                return im_pil
-
-    if len(action_stack) == 0 and not LOCAL:
-        # Retrieve the url in which the image string is stored inside s3,
-        # using the session ID
-
-        url = s3.generate_presigned_url(
-            ClientMethod="get_object", Params={"Bucket": bucket_name, "Key": session_id}
-        )
-
-        # A key replacement is required for URL pre-sign in gcp
-
-        url = url.replace("AWSAccessKeyId", "GoogleAccessId")
-
-        response = requests.get(url)
-        if DEBUG:
-            print("IMAGE STRING LENGTH: " + str(len(response.text)))
-        im_pil = drc.b64_to_pil(response.text)
-        return im_pil
-
-    # Pop out the last action
-    last_action = action_stack.pop()
-    # Apply all the previous action_stack recursively, and gets the image PIL
-    im_pil = apply_actions_on_image(
-        session_id, action_stack, filename, image_signature)
-    im_size = im_pil.size
-
-    # Apply the rest of the action_stack
-    operation = last_action["operation"]
-    selected_data = last_action["selectedData"]
-    action_type = last_action["type"]
-
-    return im_pil
-
-
 @app.callback(
     Output("div-interactive-image", "children"),
     [
@@ -346,15 +277,8 @@ def update_graph_interactive_image(
         # Resets the action stack
         storage["action_stack"] = []
 
-    # If an operation was applied (when the filename wasn't changed)
-    else:
-        # Apply the required actions to the picture, using memoized function
-        im_pil = apply_actions_on_image(
-            session_id, storage["action_stack"], filename, image_signature
-        )
-
     # IMAGE_DIR = "./images"
-    result = model.result_visualize(None, 'images')
+    result = model.result_visualize(im_pil)
     # result = im_pil
 
     t_end = time.time()

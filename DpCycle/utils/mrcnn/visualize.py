@@ -158,7 +158,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if save:
-        plt.savefig('images/result.png')
+        plt.savefig('images/result.jpeg')
     # if auto_show:
     #     plt.show()
 

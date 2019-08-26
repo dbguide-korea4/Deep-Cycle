@@ -16,71 +16,71 @@ from utils import temp
 # Variables
 HTML_IMG_SRC_PARAMETERS = "data:image/png;base64, "
 
+
 class InferenceConfig(temp.BalloonConfig):
     # Set batch size to 1 since we'll be running inference on
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
+config = InferenceConfig()
+config.display()
 
 class LoadModel():
     def __init__(self, **kwargs):
+        # Import Mask RCNN
+        from utils.mrcnn.model import MaskRCNN
         # Root directory of the project
         ROOT_DIR = os.path.abspath("./")
 
         # Directory to save logs and trained model
-        self.MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
+        MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
 
         # Local path to trained weights file
-        self.COCO_MODEL_PATH = os.path.join(
+        COCO_MODEL_PATH = os.path.join(
             ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
+            
+        """## Create Model and Load Trained Weights"""
+
+        # Create model object in inference mode.
+        self.model = MaskRCNN(
+            mode="inference", model_dir=MODEL_DIR, config=config)
+
+        # Load weights trained on MS-COCO
+        self.model.load_weights(COCO_MODEL_PATH, by_name=True)
+
+        # Define classes
+        self.class_names = ['BG', 'glass_bottle', 'pet', 'can']
 
     def result_visualize(self, pil, IMAGE_DIR=None):
         import numpy as np
         from PIL import Image
 
-        # Import Mask RCNN
-        import utils.mrcnn.model as modellib
         from utils.mrcnn import visualize
-
-        config = InferenceConfig()
-        config.display()
-
-        """## Create Model and Load Trained Weights"""
-
-        # Create model object in inference mode.
-        model = modellib.MaskRCNN(
-            mode="inference", model_dir=self.MODEL_DIR, config=config)
-
-        # Load weights trained on MS-COCO
-        model.load_weights(self.COCO_MODEL_PATH, by_name=True)
-
-        # Define classes
-        class_names = ['BG', 'glass_bottle', 'pet', 'can']
 
         """## Run Object Detection"""
 
         # Load a random image from the images folder
         # file_names = next(os.walk(IMAGE_DIR))[2]
 
-        if pil is not None:
-            pil = pil.convert('RGB')
-        else:
-            file_list = [f'{path}/{file}' for path, _,
-                         files in os.walk('./images') for file in files if 'upload' in file]
-            file_name = file_list[-1]
-            print(file_name)
-            pil = Image.open(file_name).convert('RGB')
+        # if pil is not None:
+        #   pil = pil.convert('RGB')
+        # else:
+        #     file_list = [f'{path}/{file}' for path, _,
+        #                  files in os.walk('./images') for file in files if 'upload' in file]
+        #     file_name = file_list[-1]
+        #     print(file_name)
+        #     pil = Image.open(file_name).convert('RGB')
 
-        image = np.array(pil)
+        image = np.array(pil.convert('RGB'))
         # Run detection
-        results = model.detect([image], verbose=1)
+        results = self.model.detect([image], verbose=1)
 
         # Visualize results
         r = results[0]
         print(r['class_ids'])
         visualize.display_instances(
-            image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'], save=True)
+            image, r['rois'], r['masks'], r['class_ids'], self.class_names, r['scores'], save=True)
 
         file_list = [f'{path}/{file}' for path, _,
                      files in os.walk('./images') for file in files if 'result' in file]
@@ -89,6 +89,8 @@ class LoadModel():
         return r_pil
 
 # Display utility functions
+
+
 def _merge(a, b):
     return dict(a, **b)
 
@@ -269,7 +271,7 @@ def NamedSlider(name, id, min, max, step, value, marks=None):
 
 # Custom Image Components
 def InteractiveImagePIL(
-    image_id, image, enc_format="png", dragmode="select", verbose=False, **kwargs
+    image_id, image, enc_format="jpeg", dragmode="select", verbose=False, **kwargs
 ):
     if enc_format == "jpeg":
         if image.mode == "RGBA":
@@ -346,4 +348,3 @@ def DisplayImagePIL(id, image, **kwargs):
         width="100%",
         **kwargs,
     )
-
