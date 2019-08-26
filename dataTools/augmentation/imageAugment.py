@@ -8,7 +8,8 @@ from PIL import Image
 class ImgAugment:
     def __init__(self, path_imgs=None, **kwargs):
         self.path_imgs = os.path.abspath(
-            './imgs') if path_imgs is None else path_imgs
+            './imgs') if path_imgs is None else os.path.abspath(path_imgs)
+        self.folder = self.path_imgs.split('\\')[-1]
 
         # 이미지(jpg, png, jpeg, gif)만 보기
         img_type = ['jpg', 'png', 'jpeg']
@@ -38,7 +39,7 @@ class ImgAugment:
         tic = time.time()
 
         path_result = os.path.join(
-            self.path_imgs, '../flip_images') if path_result is None else path_result
+            self.path_imgs, f'../flip_{self.folder}') if path_result is None else path_result
         if not os.path.isdir(path_result):
             os.makedirs(path_result)
 
@@ -121,7 +122,7 @@ class ImgAugment:
         tic = time.time()
 
         path_result = os.path.join(
-            self.path_imgs, '../gray_images') if path_result is None else path_result
+            self.path_imgs, f'../gray_{self.folder}') if path_result is None else path_result
         if not os.path.isdir(path_result):
             os.makedirs(path_result)
 
