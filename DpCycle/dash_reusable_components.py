@@ -15,6 +15,12 @@ from utils import temp
 
 # Variables
 HTML_IMG_SRC_PARAMETERS = "data:image/png;base64, "
+# Define classes
+class_names = ['BG', 'glass_bottle', 'pet', 'can']
+
+
+def timestamp():
+    return datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
 
 class InferenceConfig(temp.BalloonConfig):
@@ -23,8 +29,10 @@ class InferenceConfig(temp.BalloonConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
+
 config = InferenceConfig()
 config.display()
+
 
 class LoadModel():
     def __init__(self, **kwargs):
@@ -38,7 +46,6 @@ class LoadModel():
         self.COCO_MODEL_PATH = os.path.join(
             ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
 
-
     def result_visualize(self, pil, IMAGE_DIR=None):
         import numpy as np
         from PIL import Image
@@ -46,20 +53,6 @@ class LoadModel():
         # Import Mask RCNN
         from utils.mrcnn.model import MaskRCNN
         from utils.mrcnn import visualize
-
-        """## Run Object Detection"""
-
-        # Load a random image from the images folder
-        # file_names = next(os.walk(IMAGE_DIR))[2]
-
-        # if pil is not None:
-        #   pil = pil.convert('RGB')
-        # else:
-        #     file_list = [f'{path}/{file}' for path, _,
-        #                  files in os.walk('./images') for file in files if 'upload' in file]
-        #     file_name = file_list[-1]
-        #     print(file_name)
-        #     pil = Image.open(file_name).convert('RGB')
 
         """## Create Model and Load Trained Weights"""
 
@@ -70,24 +63,27 @@ class LoadModel():
         # Load weights trained on MS-COCO
         model.load_weights(self.COCO_MODEL_PATH, by_name=True)
 
-        # Define classes
-        class_names = ['BG', 'glass_bottle', 'pet', 'can']
-
         image = np.array(pil)
+        """## Run Object Detection"""
         # Run detection
         results = model.detect([image], verbose=1)
 
         # Visualize results
         r = results[0]
-        print(r['class_ids'])
-        image_name = visualize.display_instances(
+        image_path = visualize.display_instances(
             image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'], save=True, stamp=timestamp())
 
-        r_pil = Image.open(image_name)
+        self.class_ids = r['class_ids']
+        self.image_name = image_path.split('/')[-1]
+
+        r_pil = Image.open(image_path)
         return r_pil
 
-# Display utility functions
+    def result(self):
+        return self.class_ids
 
+
+# Display utility functions
 
 def _merge(a, b):
     return dict(a, **b)
@@ -95,10 +91,6 @@ def _merge(a, b):
 
 def _omit(omitted_keys, d):
     return {k: v for k, v in d.items() if k not in omitted_keys}
-
-
-def timestamp():
-    return datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
 
 # Image utility functions

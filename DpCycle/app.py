@@ -1,4 +1,3 @@
-
 import os
 import sys
 import time
@@ -15,6 +14,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import requests
+import plotly.graph_objs as go
 from dash.dependencies import Input, Output, State
 from flask_caching import Cache
 
@@ -25,12 +25,11 @@ DEBUG = True
 LOCAL = False
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 
-# app = dash.Dash(__name__)
-# server = app.server
-
 server = flask.Flask(__name__)
 app = dash.Dash(__name__, server=server)
 model = drc.LoadModel()
+
+classes_dic = {1: "glass_bottle", 2: "pet", 3: "can"}
 
 
 # @server.route('/favicon.ico')
@@ -202,18 +201,11 @@ def serve_layout():
                             ),
                         ]
                     ),
-                    html.Div(
-                        id="result_value",
-                        children="제발 좀 바껴라",
-                        style={"color": "white",
-                               "margin": "25px",
-                               "height": "300px",
-                               "lineHeight": "250px",
-                               "borderWidth": "1px",
-                               "borderStyle": "double",
-                               "borderRadius": "15px",
-                               "borderColor": "white",
-                               "textAlign": "center"}
+                    html.P(children="Object Count",
+                           className='plot-title'),
+                    dcc.Graph(
+                        id="pie-object-count",
+                        style={'height': '40vh', 'width': '100%'}
                     )
                 ],
             ),
@@ -223,37 +215,6 @@ def serve_layout():
 
 app.layout = serve_layout
 
-# Recursively retrieve the previous versions of the image by popping the
-# action stack
-@cache.memoize()
-def apply_actions_on_image(session_id, action_stack, filename, image_signature):
-    action_stack = deepcopy(action_stack)
-
-    # If we have arrived to the original image
-    if len(action_stack) == 0 and LOCAL:
-        with open("image_string.csv", mode="r") as image_file:
-            image_reader = csv.DictReader(image_file)
-            for row in image_reader:
-                im_pil = drc.b64_to_pil(row["image"])
-                return im_pil
-
-    if len(action_stack) == 0 and not LOCAL:
-        # Retrieve the url in which the image string is stored inside s3,
-        # using the session ID
-
-        url = s3.generate_presigned_url(
-            ClientMethod="get_object", Params={"Bucket": bucket_name, "Key": session_id}
-        )
-
-        # A key replacement is required for URL pre-sign in gcp
-
-        url = url.replace("AWSAccessKeyId", "GoogleAccessId")
-
-        response = requests.get(url)
-        if DEBUG:
-            print("IMAGE STRING LENGTH: " + str(len(response.text)))
-        im_pil = drc.b64_to_pil(response.text)
-        return im_pil
 
 @app.callback(
     Output("div-interactive-image", "children"),
@@ -308,14 +269,14 @@ def update_graph_interactive_image(
         # Resets the action stack
         storage["action_stack"] = []
     else:
-        im_pil = apply_actions_on_image(
-            session_id, storage["action_stack"], filename, image_signature
-        )
+        # im_pil = apply_actions_on_image(
+        #     session_id, storage["action_stack"], filename, image_signature
+        # )
+        im_pil = None
 
     # IMAGE_DIR = "./images"
-    result = model.result_visualize(im_pil)
-    
-    # result = im_pil
+    if im_pil is not None:
+        result = model.result_visualize(im_pil)
 
     t_end = time.time()
     if DEBUG:
@@ -333,6 +294,42 @@ def update_graph_interactive_image(
     ]
 
 
+@app.callback(Output("pie-object-count", "figure"),
+              [Input("div-storage", "children")])
+def update_object_count_pie(content):
+    layout = go.Layout(
+        showlegend=True,
+        plot_bgcolor='darkgray',
+        autosize=False,
+        margin=go.layout.Margin(
+            l=10,
+            r=10,
+            t=15,
+            b=15
+        )
+    )
+
+    classes = list(classes_dic.values())  # List of each class
+    counts = [list(model.result()).count(_)
+              for _ in classes_dic.keys()]  # List of each count
+
+    text = [f"{count} detected" for count in counts]
+
+    # Set colorscale to piechart
+    colorscale = ['#fa4f56', '#fe6767', '#ff7c79', '#ff908b', '#ffa39d', '#ffb6b0', '#ffc8c3', '#ffdbd7',
+                  '#ffedeb', '#ffffff']
+
+    pie = go.Pie(
+        labels=classes,
+        values=counts,
+        text=text,
+        hoverinfo="text+percent",
+        textinfo="label+percent",
+        marker={'colors': colorscale[:len(classes)]}
+    )
+    return go.Figure(data=[pie], layout=layout)
+
+
 # Running the server
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=DEBUG)

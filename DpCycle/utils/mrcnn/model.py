@@ -2575,6 +2575,7 @@ class MaskRCNN():
                 "scores": final_scores,
                 "masks": final_masks,
             })
+        K.clear_session()
         return results
 
     def detect_molded(self, molded_images, image_metas, verbose=0):
