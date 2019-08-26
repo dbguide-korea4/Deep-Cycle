@@ -56,7 +56,7 @@ class ImgAugment:
             img = np.array(raw_img.convert('RGB'))  # 이미지
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
-            img_name_flip = f"flip_{img_name.split('.')[0]}.jpeg"
+            img_name_flip = f"flip_{''.join(img_name.split('.')[:-1])}.jpeg"
 
             # Annotation 개수
             annotation = len(content[img_name+img_size]['regions'])
@@ -136,7 +136,7 @@ class ImgAugment:
             img_size = str(os.path.getsize(
                 os.path.join(self.path_imgs, img_name)))  # 파일 용량
 
-            img_name_gray = f"gray_{img_name.split('.')[0]}.jpeg"
+            img_name_gray = f"gray_{''.join(img_name.split('.')[:-1])}.jpeg"
             img.save(os.path.join(path_result, img_name_gray))
             img_size_gray = str(os.path.getsize(os.path.join(
                 path_result, img_name_gray)))
