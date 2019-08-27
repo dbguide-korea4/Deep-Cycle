@@ -153,8 +153,9 @@ def serve_layout():
                             # html.Img(
                             #     id="logo", src=app.get_asset_url("recycle.png")
                             # ),
-                            html.H2("Deep cycle", id="title", style={
-                                "font-family": "PT Sans Narrow"
+                            html.H1("Deep cycle", id="title", style={
+                                "font-family": "PT Sans Narrow",
+                                "font-size": "3rem"
                             }),
                         ],
                     ),
