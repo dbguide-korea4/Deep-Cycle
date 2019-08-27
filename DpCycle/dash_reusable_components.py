@@ -40,11 +40,11 @@ class LoadModel():
         ROOT_DIR = os.path.abspath("./")
 
         # Directory to save logs and trained model
-        self.MODEL_DIR = os.path.join(ROOT_DIR, "utils/logs")
+        self.MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
         # Local path to trained weights file
         self.COCO_MODEL_PATH = os.path.join(
-            ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
+            ROOT_DIR, "logs/mask_rcnn_recycle_0030.h5")
 
         self.class_ids = []
 

@@ -18,11 +18,6 @@ STORAGE_PLACEHOLDER = json.dumps(
     {"filename": None, "image_signature": None, "action_stack": []}
 )
 
-IMAGE_STRING_PLACEHOLDER = drc.pil_to_b64(
-    Image.open(os.path.join(APP_PATH, os.path.join("../images", "default.jpeg"))).copy(),
-    enc_format="jpeg",
-)
-
 GRAPH_PLACEHOLDER = dcc.Graph(
     id="interactive-image",
     figure={
@@ -77,10 +72,10 @@ def generate_lasso_mask(image, selectedData):
     y_coords = selectedData["lassoPoints"]["y"]
     y_coords_corrected = [height - coord for coord in y_coords]
 
-    coordinates_tuple = list(zip(selectedData["lassoPoints"]["x"], y_coords_corrected))
+    coordinates_tuple = list(
+        zip(selectedData["lassoPoints"]["x"], y_coords_corrected))
     mask = Image.new("L", image.size)
     draw = ImageDraw.Draw(mask)
     draw.polygon(coordinates_tuple, fill=255)
 
     return mask
-

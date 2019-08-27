@@ -126,10 +126,6 @@ def serve_layout():
     # Generates a session ID
     session_id = str(uuid.uuid4())
 
-    # Post the image to the right key, inside the bucket named after the
-    # session ID
-    store_image_string(utils.IMAGE_STRING_PLACEHOLDER, session_id)
-
     # App Layout
     return html.Div(
         id="root",

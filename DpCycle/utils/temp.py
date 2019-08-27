@@ -40,11 +40,11 @@ from utils.mrcnn import model as modellib, mrcnn_utils
 ROOT_DIR = os.path.abspath("./")
 
 # Path to trained weights file
-COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "utils/logs/mask_rcnn_coco.h5")
+COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "utils/logs")
+DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 ############################################################
 #  Configurations
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
-                        help='Logs and checkpoints directory (default=utils/logs/)')
+                        help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the color splash effect on')
