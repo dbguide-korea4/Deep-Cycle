@@ -139,15 +139,23 @@ def serve_layout():
             # Main body
             html.Div(
                 id="app-container",
+                style={
+                    "padding-top": "1rem"
+                },
                 children=[
                     # Banner display
                     html.Div(
                         id="banner",
+                        style={
+                            "padding-bottom": "1rem"
+                        },
                         children=[
                             # html.Img(
                             #     id="logo", src=app.get_asset_url("recycle.png")
                             # ),
-                            html.H2("Deep cycle", id="title"),
+                            html.H2("Deep cycle", id="title", style={
+                                "font-family": "PT Sans Narrow"
+                            }),
                         ],
                     ),
                     html.Div(
@@ -270,6 +278,7 @@ def update_graph_interactive_image(
         storage["action_stack"] = []
         im_pil = model.result_visualize(im_pil)
     else:
+        # store_image_string(utils.IMAGE_STRING_PLACEHOLDER, session_id)
         im_pil = drc.new_pil()
 
     t_end = time.time()
@@ -293,14 +302,15 @@ def update_graph_interactive_image(
 def update_object_count_pie(content):
     layout = go.Layout(
         showlegend=True,
-        plot_bgcolor='darkgray',
+        paper_bgcolor='#31343a',
         autosize=False,
         margin=go.layout.Margin(
             l=10,
             r=10,
             t=15,
             b=15
-        )
+        ),
+        font={"color": "white"}
     )
 
     classes = list(classes_dic.values())  # List of each class
@@ -310,8 +320,7 @@ def update_object_count_pie(content):
     text = [f"{count} detected{info}" for count, info in zip(counts, info_dic.values())]
 
     # Set colorscale to piechart
-    colorscale = ['#fa4f56', '#fe6767', '#ff7c79', '#ff908b', '#ffa39d', '#ffb6b0', '#ffc8c3', '#ffdbd7',
-                  '#ffedeb', '#ffffff']
+    colorscale = ['#f7c066', '#ffdf85', '#fff4af', '#ffffc5']
 
     pie = go.Pie(
         labels=classes,

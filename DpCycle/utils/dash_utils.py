@@ -18,6 +18,12 @@ STORAGE_PLACEHOLDER = json.dumps(
     {"filename": None, "image_signature": None, "action_stack": []}
 )
 
+IMAGE_STRING_PLACEHOLDER = drc.pil_to_b64(
+    Image.open(os.path.join(APP_PATH, os.path.join(
+        "../images", "default.png"))).copy(),
+    enc_format="png",
+)
+
 GRAPH_PLACEHOLDER = dcc.Graph(
     id="interactive-image",
     figure={

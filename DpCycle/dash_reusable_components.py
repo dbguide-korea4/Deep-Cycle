@@ -96,9 +96,9 @@ def _omit(omitted_keys, d):
 
 
 # Image utility functions
-def new_pil(shape=[100, 100, 3], rgb=255):
+def new_pil(shape=[100, 100, 4], rgb=0):
     np_array = np.zeros(shape, dtype=np.uint8)
-    np_array.fill(255)
+    np_array.fill(rgb)
 
     im_pil = Image.fromarray(np_array)
 
