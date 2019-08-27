@@ -30,6 +30,10 @@ app = dash.Dash(__name__, server=server)
 model = drc.LoadModel()
 
 classes_dic = {1: "glass_bottle", 2: "pet", 3: "can"}
+info_dic = {1: "<br>내용물을 비우고 물로 헹구는 등 이물질을 제거하여 배출<br>담배꽁초 등 이물질을 넣지 않고 배출<br>유리병이 깨지지 않도록 주의하여 배출<br>소주, 맥주 등 빈용기보증금 대상 유리병은 소매점 등으로 반납하여 보증금 환급",
+            2: "<br>내용물을 비우고 물로 헹구는 등 이물질을 제거하여 배출<br>부착상표, 부속품 등 본체와 다른 재질은 제거한 후 배출",
+            3: "<br>내용물을 비우고 물로 헹구는 등 이물질을 제거하여 배출<br>담배꽁초 등 이물질을 넣지 않고 배출<br>플라스틱 뚜껑 등 금속캔과 다른 재질은 제거한 후 배출"}
+
 
 
 # @server.route('/favicon.ico')
@@ -303,7 +307,7 @@ def update_object_count_pie(content):
     counts = [list(model.result()).count(_)
               for _ in classes_dic.keys()]  # List of each count
 
-    text = [f"{count} detected" for count in counts]
+    text = [f"{count} detected{info}" for count, info in zip(counts, info_dic.values())]
 
     # Set colorscale to piechart
     colorscale = ['#fa4f56', '#fe6767', '#ff7c79', '#ff908b', '#ffa39d', '#ffb6b0', '#ffc8c3', '#ffdbd7',
