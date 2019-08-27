@@ -268,15 +268,9 @@ def update_graph_interactive_image(
 
         # Resets the action stack
         storage["action_stack"] = []
+        im_pil = model.result_visualize(im_pil)
     else:
-        # im_pil = apply_actions_on_image(
-        #     session_id, storage["action_stack"], filename, image_signature
-        # )
-        im_pil = None
-
-    # IMAGE_DIR = "./images"
-    if im_pil is not None:
-        result = model.result_visualize(im_pil)
+        im_pil = drc.new_pil()
 
     t_end = time.time()
     if DEBUG:
@@ -285,7 +279,7 @@ def update_graph_interactive_image(
     return [
         drc.InteractiveImagePIL(
             image_id="interactive-image",
-            image=result,
+            image=im_pil,
             verbose=DEBUG,
         ),
         html.Div(

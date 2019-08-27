@@ -46,6 +46,8 @@ class LoadModel():
         self.COCO_MODEL_PATH = os.path.join(
             ROOT_DIR, "utils/logs/mask_rcnn_recycle_0030.h5")
 
+        self.class_ids = []
+
     def result_visualize(self, pil, IMAGE_DIR=None):
         import numpy as np
         from PIL import Image
@@ -63,7 +65,7 @@ class LoadModel():
         # Load weights trained on MS-COCO
         model.load_weights(self.COCO_MODEL_PATH, by_name=True)
 
-        image = np.array(pil)
+        image = np.array(pil.convert('RGB'))
         """## Run Object Detection"""
         # Run detection
         results = model.detect([image], verbose=1)
@@ -94,6 +96,15 @@ def _omit(omitted_keys, d):
 
 
 # Image utility functions
+def new_pil(shape=[100, 100, 3], rgb=255):
+    np_array = np.zeros(shape, dtype=np.uint8)
+    np_array.fill(255)
+
+    im_pil = Image.fromarray(np_array)
+
+    return im_pil
+
+
 def pil_to_b64(im, enc_format="png", verbose=False, **kwargs):
     """
     Converts a PIL Image into base64 string for HTML displaying
