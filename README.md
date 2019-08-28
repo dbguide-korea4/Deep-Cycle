@@ -9,7 +9,7 @@ Project of Recycling with Big Data
 ## Docs
 
 - [보고서](docs/보고서(고려대-4조).docx)
-- [발표 PPT](docs/발표자료/고려대 4조 - Deep Cycle_ver1.pptx)
+- [발표PPT](docs/발표자료/고려대 4조 - Deep Cycle_ver1.pptx)
 ___
 
 ## How to use
