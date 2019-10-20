@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import uuid
-from copy import deepcopy
 import csv
 import json
 import pathlib
